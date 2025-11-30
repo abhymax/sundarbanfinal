@@ -1,0 +1,18 @@
+[30-Nov-2025 22:45:54 UTC] PHP Warning:  Undefined array key "video_url" in /home/s4rgthy671q/public_html/index.php on line 50
+[30-Nov-2025 22:45:54 UTC] PHP Warning:  session_start(): Session cannot be started after headers have already been sent in /home/s4rgthy671q/public_html/header.php on line 3
+[30-Nov-2025 22:55:13 UTC] PHP Warning:  Undefined array key "location" in /home/s4rgthy671q/public_html/index.php on line 370
+[30-Nov-2025 22:55:13 UTC] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in /home/s4rgthy671q/public_html/index.php on line 370
+[30-Nov-2025 22:55:13 UTC] PHP Warning:  Undefined array key "location" in /home/s4rgthy671q/public_html/index.php on line 370
+[30-Nov-2025 22:55:13 UTC] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in /home/s4rgthy671q/public_html/index.php on line 370
+[30-Nov-2025 22:55:13 UTC] PHP Warning:  Undefined array key "location" in /home/s4rgthy671q/public_html/index.php on line 370
+[30-Nov-2025 22:55:13 UTC] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in /home/s4rgthy671q/public_html/index.php on line 370
+[30-Nov-2025 22:55:13 UTC] PHP Warning:  Undefined array key "location" in /home/s4rgthy671q/public_html/index.php on line 370
+[30-Nov-2025 22:55:13 UTC] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in /home/s4rgthy671q/public_html/index.php on line 370
+[30-Nov-2025 22:55:13 UTC] PHP Warning:  Undefined array key "location" in /home/s4rgthy671q/public_html/index.php on line 390
+[30-Nov-2025 22:55:13 UTC] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in /home/s4rgthy671q/public_html/index.php on line 390
+[30-Nov-2025 22:55:13 UTC] PHP Warning:  Undefined array key "location" in /home/s4rgthy671q/public_html/index.php on line 390
+[30-Nov-2025 22:55:13 UTC] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in /home/s4rgthy671q/public_html/index.php on line 390
+[30-Nov-2025 22:55:13 UTC] PHP Warning:  Undefined array key "location" in /home/s4rgthy671q/public_html/index.php on line 390
+[30-Nov-2025 22:55:13 UTC] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in /home/s4rgthy671q/public_html/index.php on line 390
+[30-Nov-2025 22:55:13 UTC] PHP Warning:  Undefined array key "location" in /home/s4rgthy671q/public_html/index.php on line 390
+[30-Nov-2025 22:55:13 UTC] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in /home/s4rgthy671q/public_html/index.php on line 390

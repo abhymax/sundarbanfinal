@@ -1,0 +1,477 @@
+<?php
+require_once 'db_connect.php';
+
+// Fetch Packages
+try {
+    $stmt = $pdo->query("SELECT * FROM packages");
+    $packages = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} catch (PDOException $e) {
+    $packages = [];
+    // Log error or handle gracefully
+}
+
+// Fetch Hero Section
+try {
+    $stmt = $pdo->prepare("SELECT * FROM site_sections WHERE section_key = 'home_hero'");
+    $stmt->execute();
+    $hero = $stmt->fetch(PDO::FETCH_ASSOC);
+} catch (PDOException $e) {
+    $hero = null;
+}
+
+// Fallback for Hero if DB is empty
+if (!$hero) {
+    $hero = [
+        'title' => 'Explore the Mystic Mangroves',
+        'subtitle' => 'Experience the raw beauty of Sundarban with luxury and safety.',
+        'cta_text' => 'Book Your Trip',
+        'cta_link' => '#packages',
+        'image_url' => 'https://images.unsplash.com/photo-1544552866-d3ed42536cfd?q=80&w=1000&auto=format&fit=crop'
+    ];
+}
+?>
+<?php include 'header.php'; ?>
+
+<!-- Hero Section -->
+<section class="relative h-screen flex items-center justify-center overflow-hidden">
+    <!-- Background Image -->
+    <div class="absolute inset-0 z-0">
+        <img src="<?php echo htmlspecialchars($hero['image_url']); ?>" alt="Sundarban" class="w-full h-full object-cover">
+        <div class="absolute inset-0 bg-black/40"></div>
+    </div>
+    
+    <!-- Content -->
+    <div class="relative z-10 text-center text-white px-4 max-w-5xl mx-auto mt-16">
+        <span class="text-tiger-orange font-bold tracking-widest uppercase text-sm mb-4 block">Welcome to Sundarban Boat Safari</span>
+        <h1 class="text-5xl md:text-7xl font-bold mb-6 font-serif leading-tight"><?php echo htmlspecialchars($hero['title']); ?></h1>
+        <p class="text-xl md:text-2xl mb-10 max-w-2xl mx-auto text-gray-200"><?php echo htmlspecialchars($hero['subtitle']); ?></p>
+        
+        <!-- Booking Card -->
+        <div class="glass-card rounded-2xl p-4 md:p-6 max-w-4xl mx-auto shadow-2xl border-t border-white/40 hidden md:block mb-8">
+            <div class="grid grid-cols-4 gap-4 items-center">
+                <div class="text-left border-r border-gray-200/30 px-4">
+                    <label class="block text-xs uppercase text-gray-500 font-bold mb-1">Date</label>
+                    <input class="bg-transparent text-gray-800 font-bold w-full outline-none cursor-pointer" type="date">
+                </div>
+                <div class="text-left border-r border-gray-200/30 px-4">
+                    <label class="block text-xs uppercase text-gray-500 font-bold mb-1">Guests</label>
+                    <select class="bg-transparent text-gray-800 font-bold w-full outline-none cursor-pointer">
+                        <option>2 Travelers</option>
+                        <option>4 Travelers</option>
+                        <option>6+ Group</option>
+                    </select>
+                </div>
+                <div class="text-left border-r border-gray-200/30 px-4">
+                    <label class="block text-xs uppercase text-gray-500 font-bold mb-1">Package</label>
+                    <select class="bg-transparent text-gray-800 font-bold w-full outline-none cursor-pointer">
+                        <option>All Packages</option>
+                        <option>1 Day</option>
+                        <option>1 Night 2 Days</option>
+                        <option>2 Nights 3 Days</option>
+                    </select>
+                </div>
+                <button class="bg-safari-green text-white h-12 rounded-xl font-bold hover:bg-green-900 transition flex items-center justify-center gap-2" onclick="openBooking()">
+                    Check Availability
+                </button>
+            </div>
+        </div>
+
+        <a href="<?php echo htmlspecialchars($hero['cta_link']); ?>" class="bg-tiger-orange text-white px-10 py-4 rounded-full font-bold text-lg hover:bg-orange-600 transition inline-flex items-center gap-2 group shadow-lg hover:shadow-xl transform hover:-translate-y-1">
+            <?php echo htmlspecialchars($hero['cta_text']); ?>
+            <span class="material-symbols-outlined group-hover:translate-x-1 transition-transform">arrow_forward</span>
+        </a>
+    </div>
+</section>
+
+<!-- Who We Are Section -->
+<section class="py-24 bg-white" id="who-we-are">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+            <div class="relative rounded-[2.5rem] overflow-hidden shadow-2xl">
+                <img src="https://images.unsplash.com/photo-1624360065050-32a679d67b0c?q=80&w=1000&auto=format&fit=crop" 
+                     alt="Sundarban Aerial View" 
+                     class="w-full h-[500px] object-cover hover:scale-105 transition duration-700">
+            </div>
+            <div>
+                <span class="text-tiger-orange font-bold tracking-widest uppercase text-sm">Who We Are</span>
+                <h2 class="text-4xl md:text-5xl font-serif font-bold text-safari-green mt-3 mb-6">Sundarban Boat Safari</h2>
+                <p class="text-gray-600 mb-8 leading-relaxed text-lg">
+                    We are natives of the delta. Our mission is to show you the raw, untamed beauty of the Sundarbans while ensuring safety, comfort, and minimal ecological footprint.
+                </p>
+                <div class="space-y-6">
+                    <div class="flex gap-4 items-center">
+                        <div class="w-12 h-12 rounded-full bg-orange-100 flex items-center justify-center text-tiger-orange flex-shrink-0">
+                            <span class="material-symbols-outlined">directions_boat</span>
+                        </div>
+                        <h4 class="font-bold text-gray-800 text-lg">Premium Private Boats</h4>
+                    </div>
+                    <div class="flex gap-4 items-center">
+                        <div class="w-12 h-12 rounded-full bg-orange-100 flex items-center justify-center text-tiger-orange flex-shrink-0">
+                            <span class="material-symbols-outlined">restaurant</span>
+                        </div>
+                        <h4 class="font-bold text-gray-800 text-lg">Farm-to-Table Local Cuisine</h4>
+                    </div>
+                    <div class="flex gap-4 items-center">
+                        <div class="w-12 h-12 rounded-full bg-orange-100 flex items-center justify-center text-tiger-orange flex-shrink-0">
+                            <span class="material-symbols-outlined">verified_user</span>
+                        </div>
+                        <h4 class="font-bold text-gray-800 text-lg">Government Authorized Guides</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Packages Section -->
+<section class="py-24 bg-white relative" id="packages">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16">
+            <span class="text-tiger-orange font-bold tracking-widest uppercase text-sm">Curated Itineraries</span>
+            <h2 class="text-4xl md:text-5xl font-serif font-bold text-safari-green mt-3">Choose Your Expedition</h2>
+            <p class="text-gray-500 mt-4 max-w-2xl mx-auto">From quick day escapes to deep jungle immersions, we have
+                designed the perfect route for every traveler.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <?php if (!empty($packages)): ?>
+                    <?php foreach ($packages as $pkg): ?>
+                            <div class="group package-card relative h-[500px] rounded-3xl overflow-hidden cursor-pointer bg-gray-900 shadow-2xl"
+                                onclick="window.location.href='<?php echo htmlspecialchars($pkg['slug']); ?>.php'">
+                                <img alt="<?php echo htmlspecialchars($pkg['title']); ?>"
+                                    class="absolute inset-0 w-full h-full object-cover opacity-90 transition-transform duration-700 group-hover:scale-110"
+                                    src="<?php echo htmlspecialchars($pkg['image_url']); ?>">
+                                <div class="absolute inset-0 bg-gradient-to-t from-black/95 via-black/30 to-transparent"></div>
+
+                                <?php if ($pkg['is_popular']): ?>
+                                        <div class="absolute top-4 right-4 bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full border border-white/20 z-10">
+                                            <span class="text-xs font-bold text-white uppercase tracking-wider">Most Popular</span>
+                                        </div>
+                                <?php endif; ?>
+                                <?php if ($pkg['is_bestseller']): ?>
+                                        <div class="absolute top-4 right-4 bg-tiger-orange px-3 py-1 rounded-full shadow-lg z-10">
+                                            <span class="text-xs font-bold text-white uppercase tracking-wider">Best Seller</span>
+                                        </div>
+                                <?php endif; ?>
+
+                                <div class="absolute bottom-0 p-8 w-full z-10">
+                                    <div class="transform transition-transform duration-500 translate-y-4 group-hover:translate-y-0">
+                                        <span class="text-tiger-orange font-bold text-lg mb-1 block">₹<?php echo number_format($pkg['price']); ?> / Person</span>
+                                        <h3 class="text-3xl font-serif font-bold text-white mb-3"><?php echo htmlspecialchars($pkg['title']); ?></h3>
+                                        <ul class="text-gray-300 text-sm mb-6 space-y-2 opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-75">
+                                            <?php
+                                            $features = explode(',', $pkg['features']);
+                                            foreach ($features as $feature):
+                                                ?>
+                                                    <li class="flex items-center gap-2">
+                                                        <span class="material-symbols-outlined text-tiger-orange text-xs">check_circle</span>
+                                                        <?php echo htmlspecialchars(trim($feature)); ?>
+                                                    </li>
+                                            <?php endforeach; ?>
+                                        </ul>
+                                        <button class="block w-full text-center bg-white text-safari-green font-bold py-3 rounded-xl hover:bg-tiger-orange hover:text-white transition">View Details</button>
+                                    </div>
+                                </div>
+                            </div>
+                    <?php endforeach; ?>
+            <?php else: ?>
+                    <div class="col-span-3 text-center py-10 text-gray-500">
+                        No packages available at the moment.
+                    </div>
+            <?php endif; ?>
+        </div>
+    </div>
+</section>
+
+<!-- Wildlife Section -->
+<section class="py-24 bg-[#0a260a] relative overflow-hidden" id="wildlife">
+    <div class="absolute inset-0 opacity-5"
+        style="background-image: url('data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%23ffffff\' fill-opacity=\'1\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');">
+    </div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div class="flex flex-col md:flex-row justify-between items-end mb-16 gap-6 border-b border-white/10 pb-8">
+            <div>
+                <span class="text-tiger-orange font-bold tracking-widest uppercase text-sm">The Residents</span>
+                <h2 class="text-4xl md:text-5xl font-serif font-bold text-white mt-2">Meet the Locals</h2>
+            </div>
+            <button
+                class="group flex items-center gap-2 px-6 py-3 rounded-full border border-white/20 text-white hover:bg-tiger-orange hover:border-tiger-orange transition-all duration-300 backdrop-blur-sm">
+                <span>View Species Checklist</span>
+                <span
+                    class="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">arrow_forward</span>
+            </button>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12">
+
+            <div class="group text-center cursor-pointer">
+                <div class="relative w-56 h-56 mx-auto mb-8">
+                    <div
+                        class="absolute inset-0 rounded-full border border-white/10 scale-110 group-hover:scale-125 transition-transform duration-700 ease-out">
+                    </div>
+                    <div
+                        class="absolute inset-0 rounded-full border border-tiger-orange/30 scale-100 group-hover:scale-110 transition-transform duration-500 delay-75">
+                    </div>
+
+                    <div
+                        class="w-full h-full rounded-full overflow-hidden border-4 border-[#0a260a] relative z-10 shadow-2xl">
+                        <img src="https://images.unsplash.com/photo-1547971718-d71680108933?q=80&w=1000&auto=format&fit=crop"
+                            alt="Royal Bengal Tiger"
+                            class="w-full h-full object-cover transform transition duration-700 group-hover:scale-110 group-hover:rotate-2">
+                    </div>
+                </div>
+                <h3
+                    class="text-2xl font-serif font-bold text-white mb-2 group-hover:text-tiger-orange transition-colors">
+                    Royal Bengal Tiger</h3>
+                <p class="text-gray-400 text-sm tracking-wide uppercase font-medium">The King of the Delta</p>
+            </div>
+
+            <div class="group text-center cursor-pointer">
+                <div class="relative w-56 h-56 mx-auto mb-8">
+                    <div
+                        class="absolute inset-0 rounded-full border border-white/10 scale-110 group-hover:scale-125 transition-transform duration-700 ease-out">
+                    </div>
+                    <div
+                        class="absolute inset-0 rounded-full border border-tiger-orange/30 scale-100 group-hover:scale-110 transition-transform duration-500 delay-75">
+                    </div>
+
+                    <div
+                        class="w-full h-full rounded-full overflow-hidden border-4 border-[#0a260a] relative z-10 shadow-2xl">
+                        <img src="https://images.unsplash.com/photo-1516035069371-29a1b244cc32?q=80&w=1000&auto=format&fit=crop"
+                            alt="Saltwater Crocodile"
+                            class="w-full h-full object-cover transform transition duration-700 group-hover:scale-110 group-hover:-rotate-2">
+                    </div>
+                </div>
+                <h3
+                    class="text-2xl font-serif font-bold text-white mb-2 group-hover:text-tiger-orange transition-colors">
+                    Saltwater Croc</h3>
+                <p class="text-gray-400 text-sm tracking-wide uppercase font-medium">Prehistoric Giants</p>
+            </div>
+
+            <div class="group text-center cursor-pointer">
+                <div class="relative w-56 h-56 mx-auto mb-8">
+                    <div
+                        class="absolute inset-0 rounded-full border border-white/10 scale-110 group-hover:scale-125 transition-transform duration-700 ease-out">
+                    </div>
+                    <div
+                        class="absolute inset-0 rounded-full border border-tiger-orange/30 scale-100 group-hover:scale-110 transition-transform duration-500 delay-75">
+                    </div>
+
+                    <div
+                        class="w-full h-full rounded-full overflow-hidden border-4 border-[#0a260a] relative z-10 shadow-2xl">
+                        <img src="https://images.unsplash.com/photo-1484406566174-9da00092ee7b?q=80&w=1000&auto=format&fit=crop"
+                            alt="Spotted Deer"
+                            class="w-full h-full object-cover transform transition duration-700 group-hover:scale-110 group-hover:rotate-2">
+                    </div>
+                </div>
+                <h3
+                    class="text-2xl font-serif font-bold text-white mb-2 group-hover:text-tiger-orange transition-colors">
+                    Spotted Deer</h3>
+                <p class="text-gray-400 text-sm tracking-wide uppercase font-medium">Grace of the Forest</p>
+            </div>
+
+            <div class="group text-center cursor-pointer">
+                <div class="relative w-56 h-56 mx-auto mb-8">
+                    <div
+                        class="absolute inset-0 rounded-full border border-white/10 scale-110 group-hover:scale-125 transition-transform duration-700 ease-out">
+                    </div>
+                    <div
+                        class="absolute inset-0 rounded-full border border-tiger-orange/30 scale-100 group-hover:scale-110 transition-transform duration-500 delay-75">
+                    </div>
+
+                    <div
+                        class="w-full h-full rounded-full overflow-hidden border-4 border-[#0a260a] relative z-10 shadow-2xl">
+                        <img src="https://images.unsplash.com/photo-1544552866-d3ed42536cfd?q=80&w=1000&auto=format&fit=crop"
+                            alt="Kingfisher"
+                            class="w-full h-full object-cover transform transition duration-700 group-hover:scale-110 group-hover:-rotate-2">
+                    </div>
+                </div>
+                <h3
+                    class="text-2xl font-serif font-bold text-white mb-2 group-hover:text-tiger-orange transition-colors">
+                    Kingfisher</h3>
+                <p class="text-gray-400 text-sm tracking-wide uppercase font-medium">Vibrant Hunters</p>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<section class="py-24 bg-safari-green overflow-hidden relative" id="gallery">
+    <div class="absolute top-0 left-0 w-full h-full opacity-10"
+        style="background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMSIgY3k9IjEiIHI9IjEiIGZpbGw9IiZmZmZmZiIvPjwvc3ZnPg==');">
+    </div>
+    <div class="max-w-7xl mx-auto px-4 relative z-10">
+        <div class="text-center mb-16">
+            <h2 class="text-4xl font-serif font-bold text-white">Moments in the Wild</h2>
+            <p class="text-gray-300 mt-4">Snapshots from our recent expeditions.</p>
+        </div>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div style="border-radius: 8px; overflow:hidden;">
+                <img alt="Tiger"
+                    class="w-full h-64 object-cover rounded-lg hover:scale-105 transition duration-500 cursor-pointer"
+                    src="https://encrypted-tbn2.gstatic.com/licensed-image?q=tbn:ANd9GcQebS5WO_E-xMPSsl4Stf4ax5z-ZVhd-lZOkZ9HUIz3km8w6Qy516Xv9rXytBu11zRr7wpya2FJk0ek4zQ">
+            </div>
+            <div style="border-radius: 8px; overflow:hidden;">
+                <img alt="Bird"
+                    class="w-full h-64 object-cover rounded-lg hover:scale-105 transition duration-500 cursor-pointer"
+                    src="https://encrypted-tbn0.gstatic.com/licensed-image?q=tbn:ANd9GcQ_4GWxyh_Py6D9pViXFU2N0pS4ImvIRVa6Xc2Cmn1HiAlYY5J_c9rFifUvH_gAwQPjWgihfIm--qi18JM">
+            </div>
+            <div style="border-radius: 8px; overflow:hidden;">
+                <img alt="Deer"
+                    class="w-full h-64 object-cover rounded-lg hover:scale-105 transition duration-500 cursor-pointer"
+                    src="https://encrypted-tbn1.gstatic.com/licensed-image?q=tbn:ANd9GcTcCOpXPPfVaoXairyHxu_e29TVTPg0YcGHkSz1aycZFclxHAe_J9JDJby1BQF-Xt8vJilrwzcQpsFVwJE">
+            </div>
+            <img alt="Boat"
+                class="w-full h-64 object-cover rounded-lg hover:scale-105 transition duration-500 cursor-pointer"
+                src="https://images.unsplash.com/photo-1542332213-31f87348057f?q=80&w=2670&auto=format&fit=crop">
+        </div>
+    </div>
+</section>
+
+<section class="py-24 bg-[#1a2e1a] overflow-hidden relative" id="testimonials">
+    <div class="absolute top-0 left-0 w-64 h-64 bg-tiger-orange/10 rounded-full blur-[100px]"></div>
+    <div class="absolute bottom-0 right-0 w-64 h-64 bg-safari-green/30 rounded-full blur-[100px]"></div>
+
+    <div class="max-w-7xl mx-auto px-4 relative z-10">
+        <div class="text-center mb-16">
+            <span class="text-tiger-orange font-bold tracking-widest uppercase text-sm">Guest Diaries</span>
+            <h2 class="text-4xl font-serif font-bold text-white mt-3">Stories from the River</h2>
+            <p class="text-gray-400 mt-4">Join 5000+ happy travelers who explored with us.</p>
+        </div>
+
+        <div class="slider-container overflow-hidden w-full relative">
+            <div
+                class="absolute left-0 top-0 h-full w-20 bg-gradient-to-r from-[#1a2e1a] to-transparent z-10 pointer-events-none">
+            </div>
+            <div
+                class="absolute right-0 top-0 h-full w-20 bg-gradient-to-l from-[#1a2e1a] to-transparent z-10 pointer-events-none">
+            </div>
+
+            <div class="testimonial-track flex gap-8 w-max">
+                <div
+                    class="w-[350px] md:w-[450px] bg-white/5 backdrop-blur-md p-8 rounded-2xl border border-white/10 hover:border-tiger-orange/50 transition duration-300">
+                    <div class="flex items-center gap-4 mb-6">
+                        <img alt="Rahul" class="w-12 h-12 rounded-full object-cover border-2 border-tiger-orange"
+                            src="https://images.unsplash.com/photo-1531891437562-4301cf35b7e4?q=80&w=2564&auto=format&fit=crop">
+                        <div>
+                            <h4 class="font-bold text-white">Rahul Sen</h4>
+                            <div class="flex text-yellow-400 text-sm">★★★★★</div>
+                        </div>
+                    </div>
+                    <p class="text-gray-300 italic">"The 2-night package was incredible. The boat was clean and the food
+                        was better than most Kolkata restaurants. We even spotted a crocodile!"</p>
+                </div>
+
+                <div
+                    class="w-[350px] md:w-[450px] bg-white/5 backdrop-blur-md p-8 rounded-2xl border border-white/10 hover:border-tiger-orange/50 transition duration-300">
+                    <div class="flex items-center gap-4 mb-6">
+                        <img alt="Sarah" class="w-12 h-12 rounded-full object-cover border-2 border-tiger-orange"
+                            src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=2574&auto=format&fit=crop">
+                        <div>
+                            <h4 class="font-bold text-white">Sarah Jenkins</h4>
+                            <div class="flex text-yellow-400 text-sm">★★★★★</div>
+                        </div>
+                    </div>
+                    <p class="text-gray-300 italic">"Our guide was so knowledgeable about the mangroves. The resort was
+                        peaceful and eco-friendly. Highly recommend for nature lovers."</p>
+                </div>
+
+                <div
+                    class="w-[350px] md:w-[450px] bg-white/5 backdrop-blur-md p-8 rounded-2xl border border-white/10 hover:border-tiger-orange/50 transition duration-300">
+                    <div class="flex items-center gap-4 mb-6">
+                        <img alt="Amit" class="w-12 h-12 rounded-full object-cover border-2 border-tiger-orange"
+                            src="https://images.unsplash.com/photo-1600486913747-55e5470d6f40?q=80&w=2670&auto=format&fit=crop">
+                        <div>
+                            <h4 class="font-bold text-white">Amit & Family</h4>
+                            <div class="flex text-yellow-400 text-sm">★★★★★</div>
+                        </div>
+                    </div>
+                    <p class="text-gray-300 italic">"Took the day tour with my parents. The pickup was on time, the car
+                        was AC, and the boat ride was very relaxing. Excellent service."</p>
+                </div>
+
+                <div
+                    class="w-[350px] md:w-[450px] bg-white/5 backdrop-blur-md p-8 rounded-2xl border border-white/10 hover:border-tiger-orange/50 transition duration-300">
+                    <div class="flex items-center gap-4 mb-6">
+                        <img alt="Priya" class="w-12 h-12 rounded-full object-cover border-2 border-tiger-orange"
+                            src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=2576&auto=format&fit=crop">
+                        <div>
+                            <h4 class="font-bold text-white">Priya Das</h4>
+                            <div class="flex text-yellow-400 text-sm">★★★★★</div>
+                        </div>
+                    </div>
+                    <p class="text-gray-300 italic">"A magical experience. The sunset from the boat deck is something I
+                        will never forget. Staff was very polite."</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="py-24 bg-safari-green text-white" id="faq">
+    <div class="max-w-4xl mx-auto px-4">
+        <div class="text-center mb-12">
+            <span class="text-tiger-orange font-bold tracking-widest uppercase text-sm">Good to Know</span>
+            <h2 class="text-4xl font-serif font-bold mt-2">Frequently Asked Questions</h2>
+        </div>
+        <div class="space-y-4">
+            <div class="faq-item border border-white/20 rounded-xl bg-white/5 overflow-hidden">
+                <button class="w-full flex justify-between items-center p-6 text-left hover:bg-white/10 transition"
+                    onclick="toggleFaq(this)">
+                    <span class="font-bold text-lg">Is it safe to visit Sundarban?</span>
+                    <span class="material-symbols-outlined faq-icon">expand_more</span>
+                </button>
+                <div class="faq-content">
+                    <div class="p-6 pt-0 text-gray-300">
+                        Absolutely. We operate only in government-designated tourism zones. Our boats are equipped with
+                        life jackets and first aid, and we strictly follow safety protocols.
+                    </div>
+                </div>
+            </div>
+            <div class="faq-item border border-white/20 rounded-xl bg-white/5 overflow-hidden">
+                <button class="w-full flex justify-between items-center p-6 text-left hover:bg-white/10 transition"
+                    onclick="toggleFaq(this)">
+                    <span class="font-bold text-lg">What is the best time to visit?</span>
+                    <span class="material-symbols-outlined faq-icon">expand_more</span>
+                </button>
+                <div class="faq-content">
+                    <div class="p-6 pt-0 text-gray-300">
+                        The best time is from September to March when the weather is pleasant. However, the forest is
+                        green and beautiful during the monsoon (July-August) as well.
+                    </div>
+                </div>
+            </div>
+            <div class="faq-item border border-white/20 rounded-xl bg-white/5 overflow-hidden">
+                <button class="w-full flex justify-between items-center p-6 text-left hover:bg-white/10 transition"
+                    onclick="toggleFaq(this)">
+                    <span class="font-bold text-lg">Is food included in the package?</span>
+                    <span class="material-symbols-outlined faq-icon">expand_more</span>
+                </button>
+                <div class="faq-content">
+                    <div class="p-6 pt-0 text-gray-300">
+                        Yes! All our packages are all-inclusive. You get Bed Tea, Breakfast, Lunch, Evening Snacks, and
+                        Dinner (for overnight trips). We serve bottled mineral water.
+                    </div>
+                </div>
+            </div>
+            <div class="faq-item border border-white/20 rounded-xl bg-white/5 overflow-hidden">
+                <button class="w-full flex justify-between items-center p-6 text-left hover:bg-white/10 transition"
+                    onclick="toggleFaq(this)">
+                    <span class="font-bold text-lg">Do we need permits?</span>
+                    <span class="material-symbols-outlined faq-icon">expand_more</span>
+                </button>
+                <div class="faq-content">
+                    <div class="p-6 pt-0 text-gray-300">
+                        Yes, forest permits are mandatory. But don't worry, we handle all the paperwork and permit fees.
+                        You just need to carry a valid ID proof.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="contact"></section>
+
+<?php include 'footer.php'; ?>

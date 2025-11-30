@@ -1,0 +1,12 @@
+<?php
+require_once 'db_connect.php';
+try {
+    $stmt = $pdo->query("DESCRIBE site_sections");
+    $columns = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    foreach ($columns as $col) {
+        echo $col['Field'] . " - " . $col['Type'] . "\n";
+    }
+} catch (PDOException $e) {
+    echo "Error: " . $e->getMessage();
+}
+?>
