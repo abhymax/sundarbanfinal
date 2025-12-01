@@ -574,3 +574,7 @@
 [01-Dec-2025 12:35:39 UTC] PHP Warning:  foreach() argument must be of type array|object, null given in /home/s4rgthy671q/public_html/footer.php on line 88
 [01-Dec-2025 18:44:01 UTC] PHP Warning:  Undefined variable $packages in /home/s4rgthy671q/public_html/footer.php on line 105
 [01-Dec-2025 18:44:01 UTC] PHP Warning:  foreach() argument must be of type array|object, null given in /home/s4rgthy671q/public_html/footer.php on line 105
+[01-Dec-2025 19:00:09 UTC] PHP Warning:  Undefined variable $packages in /home/s4rgthy671q/public_html/footer.php on line 105
+[01-Dec-2025 19:00:09 UTC] PHP Warning:  foreach() argument must be of type array|object, null given in /home/s4rgthy671q/public_html/footer.php on line 105
+[01-Dec-2025 19:40:23 UTC] PHP Warning:  Undefined variable $packages in /home/s4rgthy671q/public_html/footer.php on line 105
+[01-Dec-2025 19:40:23 UTC] PHP Warning:  foreach() argument must be of type array|object, null given in /home/s4rgthy671q/public_html/footer.php on line 105
