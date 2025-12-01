@@ -135,8 +135,8 @@ try {
                 </div>
 
                 <button id="hero-check-btn" class="bg-[#2E4622] text-white h-12 rounded-xl font-bold hover:bg-[#1a2e1a] transition flex items-center justify-center gap-2 shadow-lg transform hover:-translate-y-0.5 text-sm uppercase tracking-wide">
-                    Check Availability
-                </button>
+    Check Availability
+</button>
             </div>
         </div>
 

@@ -23,125 +23,75 @@ try {
                                     <div class="w-10 h-10 bg-tiger-orange rounded-full flex items-center justify-center text-black">
                                         <span class="material-symbols-outlined">directions_boat</span>
                                     </div>
-                                    <span
-                                        class="font-serif text-2xl font-bold"><?php echo htmlspecialchars($settings['logo_text']); ?></span>
+                                    <span class="font-serif text-2xl font-bold"><?php echo htmlspecialchars($settings['logo_text']); ?></span>
                                 <?php endif; ?>
                             </div>
                             <div class="text-gray-400 max-w-sm mb-6 leading-relaxed">
                                 <?php echo nl2br(htmlspecialchars($section['content'])); ?>
                             </div>
-                            <div class="flex space-x-4">
-                                <?php if (!empty($settings['facebook_url']) && $settings['facebook_url'] != '#'): ?>
-                                    <a class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-tiger-orange transition"
-                                        href="<?php echo htmlspecialchars($settings['facebook_url']); ?>" target="_blank"><span
-                                            class="material-symbols-outlined">public</span></a>
-                                <?php endif; ?>
-                                <a class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-tiger-orange transition"
-                                    href="mailto:<?php echo htmlspecialchars($settings['email']); ?>"><span
-                                        class="material-symbols-outlined">mail</span></a>
-                                <a class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-tiger-orange transition"
-                                    href="tel:<?php echo htmlspecialchars($settings['phone']); ?>"><span
-                                        class="material-symbols-outlined">call</span></a>
-                            </div>
                         <?php else: ?>
                             <h4 class="font-bold text-lg mb-6 text-safari-green-light">
                                 <?php echo htmlspecialchars($section['title']); ?></h4>
                             <div class="text-gray-400 space-y-4 footer-links">
-                                <?php echo $section['content']; // Assuming HTML content for links ?>
+                                <?php echo $section['content']; ?>
                             </div>
                         <?php endif; ?>
                     </div>
                 <?php endforeach; ?>
             <?php else: ?>
-                <!-- Fallback Static Content -->
                 <div class="col-span-1 md:col-span-2">
-                    <div class="flex items-center gap-3 mb-6">
-                        <div class="w-10 h-10 bg-tiger-orange rounded-full flex items-center justify-center text-white">
-                            <span class="material-symbols-outlined">directions_boat</span>
-                        </div>
-                        <span class="font-serif text-3xl font-bold">Sundarban Boat Safari</span>
-                    </div>
-                    <p class="text-gray-400 max-w-sm mb-6">
-                        We are dedicated to sustainable tourism in the Sundarban Biosphere Reserve. Experience nature in its
-                        purest form with the locals.
-                    </p>
+                    <h3 class="font-serif text-3xl font-bold text-white">Sundarban Boat Safari</h3>
+                    <p class="text-gray-400 mt-4">Experience the wild with the locals.</p>
                 </div>
             <?php endif; ?>
         </div>
-        <div class="border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
-            <p class="text-gray-500 text-sm">© <?php echo date('Y'); ?>
-                <?php echo htmlspecialchars($settings['site_name']); ?>. All rights reserved.</p>
-            <div class="flex gap-6 text-sm text-gray-500">
-                <a class="hover:text-white transition" href="#">Privacy Policy</a>
-                <a class="hover:text-white transition" href="#">Terms of Service</a>
-            </div>
+        <div class="border-t border-white/10 pt-8 flex justify-between items-center">
+            <p class="text-gray-500 text-sm">© <?php echo date('Y'); ?> <?php echo htmlspecialchars($settings['site_name']); ?>.</p>
         </div>
     </div>
 </footer>
 
-<!-- Floating Action Buttons -->
-<!-- WhatsApp Button (Bottom Right) -->
 <div class="fixed bottom-6 right-6 z-50">
     <a href="https://wa.me/<?php echo str_replace(['+', ' '], '', $settings['whatsapp_number']); ?>" target="_blank"
-        class="w-14 h-14 bg-[#25D366] rounded-full shadow-lg flex items-center justify-center text-white hover:scale-110 transition-transform duration-300 group relative">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp" class="w-8 h-8">
-        <span
-            class="absolute right-full mr-4 bg-white text-gray-800 px-3 py-1 rounded-lg text-sm font-bold opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap shadow-md">
-            <?php echo htmlspecialchars($settings['whatsapp_label'] ?? 'Chat with us'); ?>
-        </span>
+        class="w-14 h-14 bg-[#25D366] rounded-full shadow-lg flex items-center justify-center text-white hover:scale-110 transition-transform duration-300">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" class="w-8 h-8">
     </a>
 </div>
 
-<!-- Call Button (Bottom Left) -->
-<div class="fixed bottom-6 left-6 z-50">
-    <a href="tel:<?php echo htmlspecialchars($settings['call_button_number'] ?? $settings['phone']); ?>"
-        class="w-14 h-14 bg-tiger-orange rounded-full shadow-lg flex items-center justify-center text-black hover:scale-110 transition-transform duration-300 group relative">
-        <span class="material-symbols-outlined text-3xl">call</span>
-        <span
-            class="absolute left-full ml-4 bg-white text-gray-800 px-3 py-1 rounded-lg text-sm font-bold opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap shadow-md">
-            <?php echo htmlspecialchars($settings['call_label'] ?? 'Call Now'); ?>
-        </span>
-    </a>
-</div>
-
-<!-- Booking Modal -->
-<div id="bookingModal" class="fixed inset-0 z-[100] hidden">
+<div id="bookingModal" class="fixed inset-0 z-[100] hidden" style="display: none;">
     <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeBooking()"></div>
-    <div class="absolute right-0 top-0 h-full w-full md:w-[500px] bg-white shadow-2xl transform transition-transform duration-300 translate-x-full"
-        id="bookingSidebar">
-        <div class="p-6 h-full overflow-y-auto">
-            <div class="flex justify-between items-center mb-8">
-                <h3 class="text-2xl font-bold font-serif text-safari-green">Plan Your Trip</h3>
-                <button onclick="closeBooking()"
-                    class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition">
-                    <span class="material-symbols-outlined">close</span>
-                </button>
-            </div>
+    
+    <div id="bookingSidebar" class="absolute right-0 top-0 h-full w-full md:w-[500px] bg-white shadow-2xl transform translate-x-full transition-transform duration-300 flex flex-col">
+        
+        <div class="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+            <h3 class="text-2xl font-bold font-serif text-[#2E4622]">Plan Your Trip</h3>
+            <button onclick="closeBooking()" class="w-10 h-10 rounded-full bg-white border border-gray-200 flex items-center justify-center hover:bg-red-50 text-gray-500 hover:text-red-500">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
 
+        <div class="flex-1 p-6 overflow-y-auto">
             <div id="form-status" class="hidden p-4 mb-6 rounded-xl text-sm font-medium border"></div>
 
             <form class="space-y-6" id="booking-form">
                 <div>
-                    <label class="block text-sm font-bold text-gray-700 mb-2">Select Package</label>
-                    <select name="package" id="modal-package"
-                        class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-tiger-orange transition">
+                    <label class="block text-xs font-bold text-gray-600 mb-1 uppercase">Select Package</label>
+                    <select name="package" id="modal-package" class="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 focus:ring-2 focus:ring-yellow-500 outline-none">
                         <option value="Custom Tour">Select a Package</option>
-                        <option value="1 Day Tour">1 Day Sundarban Tour</option>
-                        <option value="1 Night 2 Days">1 Night 2 Days Adventure</option>
-                        <option value="2 Nights 3 Days">2 Nights 3 Days Safari</option>
+                        <?php foreach ($packages as $pkg): ?>
+                            <option value="<?php echo htmlspecialchars($pkg['title']); ?>"><?php echo htmlspecialchars($pkg['title']); ?></option>
+                        <?php endforeach; ?>
                     </select>
                 </div>
 
                 <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-sm font-bold text-gray-700 mb-2">Travel Date</label>
-                        <input type="date" name="date" id="modal-date" required
-                            class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-tiger-orange transition">
+                        <label class="block text-xs font-bold text-gray-600 mb-1 uppercase">Date</label>
+                        <input type="date" name="date" id="modal-date" required class="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 focus:ring-2 focus:ring-yellow-500 outline-none">
                     </div>
                     <div>
-                        <label class="block text-sm font-bold text-gray-700 mb-2">Travelers</label>
-                        <select name="travelers" id="modal-travelers"
-                            class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-tiger-orange transition">
+                        <label class="block text-xs font-bold text-gray-600 mb-1 uppercase">Travelers</label>
+                        <select name="travelers" id="modal-travelers" class="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 focus:ring-2 focus:ring-yellow-500 outline-none">
                             <option value="2">2 Adults</option>
                             <option value="3">3 Adults</option>
                             <option value="4">4+ Adults</option>
@@ -151,49 +101,128 @@ try {
                 </div>
 
                 <div>
-                    <label class="block text-sm font-bold text-gray-700 mb-2">Full Name</label>
-                    <input type="text" name="name" placeholder="John Doe" required
-                        class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-tiger-orange transition">
+                    <label class="block text-xs font-bold text-gray-600 mb-1 uppercase">Your Name</label>
+                    <input type="text" name="name" required class="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 focus:ring-2 focus:ring-yellow-500 outline-none">
                 </div>
 
                 <div>
-                    <label class="block text-sm font-bold text-gray-700 mb-2">Phone Number</label>
-                    <input type="tel" name="phone" placeholder="+91 98765 43210" required
-                        class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-tiger-orange transition">
+                    <label class="block text-xs font-bold text-gray-600 mb-1 uppercase">Phone Number</label>
+                    <input type="tel" name="phone" required class="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 focus:ring-2 focus:ring-yellow-500 outline-none">
                 </div>
 
                 <div>
-                    <label class="block text-sm font-bold text-gray-700 mb-2">Email Address</label>
-                    <input type="email" name="email" placeholder="john@example.com"
-                        class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-tiger-orange transition">
+                    <label class="block text-xs font-bold text-gray-600 mb-1 uppercase">Email</label>
+                    <input type="email" name="email" class="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 focus:ring-2 focus:ring-yellow-500 outline-none">
                 </div>
 
                 <?php 
-                    $num1 = rand(1, 9);
-                    $num2 = rand(1, 9);
-                    $_SESSION['captcha_result'] = $num1 + $num2;
+                    $n1 = rand(2, 8); $n2 = rand(2, 8);
+                    $_SESSION['captcha_result'] = $n1 + $n2;
                 ?>
-                <div class="bg-orange-50 p-4 rounded-xl border border-orange-100 flex items-center justify-between">
-                    <label class="text-sm font-bold text-gray-700">Security Check: <span class="text-orange-600"><?php echo $num1; ?> + <?php echo $num2; ?> = ?</span></label>
-                    <input type="number" name="captcha" required class="w-20 bg-white border border-gray-300 rounded-lg px-3 py-2 text-center font-bold text-lg focus:outline-none focus:ring-2 focus:ring-tiger-orange">
+                <div class="bg-yellow-50 p-4 rounded-lg border border-yellow-200 flex items-center justify-between">
+                    <span class="font-bold text-gray-700 text-sm">Solve: <?php echo "$n1 + $n2 = ?"; ?></span>
+                    <input type="number" name="captcha" required class="w-20 text-center font-bold border border-gray-300 rounded p-2">
                 </div>
 
-                <button type="submit" id="submit-btn"
-                    class="w-full bg-tiger-orange text-black font-bold py-4 rounded-xl hover:bg-orange-400 transition shadow-lg flex items-center justify-center gap-2">
-                    <span>Confirm Booking Request</span>
-                    <span class="material-symbols-outlined">arrow_forward</span>
+                <button type="submit" id="submit-btn" class="w-full bg-[#FFD700] text-black font-bold py-4 rounded-xl hover:bg-yellow-400 transition shadow-lg">
+                    Confirm Inquiry
                 </button>
-
-                <p class="text-xs text-center text-gray-400">
-                    <span class="material-symbols-outlined text-[12px] align-middle">lock</span> Your details are secure. No payment needed now.
-                </p>
             </form>
         </div>
     </div>
 </div>
 
-<script src="script.js"></script>
-<script src="booking.js"></script>
-</body>
+<script>
+    console.log("Footer Script Loaded: Initializing Modal Logic...");
 
+    // 1. Define Global Open Function
+    function openBooking() {
+        console.log("openBooking() called!");
+        const modal = document.getElementById('bookingModal');
+        const sidebar = document.getElementById('bookingSidebar');
+        
+        if(modal && sidebar) {
+            modal.classList.remove('hidden');
+            modal.style.display = 'block'; // Force CSS display
+            
+            // Slide in animation
+            setTimeout(() => {
+                sidebar.classList.remove('translate-x-full');
+            }, 10);
+        } else {
+            alert("Error: Booking form not found. Please reload the page.");
+        }
+    }
+
+    // 2. Define Global Close Function
+    function closeBooking() {
+        const modal = document.getElementById('bookingModal');
+        const sidebar = document.getElementById('bookingSidebar');
+        
+        if(modal && sidebar) {
+            sidebar.classList.add('translate-x-full');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                modal.style.display = 'none';
+            }, 300);
+        }
+    }
+
+    // 3. Auto-Connect Hero Button on Load
+    document.addEventListener('DOMContentLoaded', function() {
+        const heroBtn = document.getElementById('hero-check-btn');
+        
+        if(heroBtn) {
+            console.log("Hero Button Found. Attaching Event...");
+            heroBtn.onclick = function(e) {
+                e.preventDefault(); // Stop any default link behavior
+                console.log("Hero Button Clicked!");
+                
+                // Transfer Data
+                const hDate = document.getElementById('hero-date')?.value;
+                const hGuests = document.getElementById('hero-guests')?.value;
+                const hPackage = document.getElementById('hero-package')?.value;
+
+                if(hDate) document.getElementById('modal-date').value = hDate;
+                if(hGuests) document.getElementById('modal-travelers').value = hGuests;
+                if(hPackage && hPackage !== 'All Packages') document.getElementById('modal-package').value = hPackage;
+
+                openBooking(); // Trigger Modal
+            };
+        } else {
+            console.warn("Hero Button (hero-check-btn) NOT found in DOM.");
+        }
+
+        // Form Submit Logic
+        const form = document.getElementById('booking-form');
+        if(form) {
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const btn = document.getElementById('submit-btn');
+                const statusBox = document.getElementById('form-status');
+                btn.disabled = true;
+                btn.innerText = "Sending...";
+
+                const formData = new FormData(form);
+                fetch('submit_booking.php', { method: 'POST', body: formData })
+                .then(res => res.json())
+                .then(data => {
+                    statusBox.classList.remove('hidden');
+                    statusBox.style.display = 'block';
+                    if(data.status === 'success') {
+                        statusBox.innerHTML = '<span class="text-green-600 font-bold">✓ ' + data.message + '</span>';
+                        form.reset();
+                        setTimeout(() => { closeBooking(); statusBox.style.display='none'; }, 3000);
+                    } else {
+                        statusBox.innerHTML = '<span class="text-red-600 font-bold">⚠️ ' + data.message + '</span>';
+                    }
+                })
+                .catch(err => alert("Network Error. Try again."))
+                .finally(() => { btn.disabled = false; btn.innerText = "Confirm Inquiry"; });
+            });
+        }
+    });
+</script>
+
+<script src="script.js"></script> </body>
 </html>
