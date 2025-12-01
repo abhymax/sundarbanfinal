@@ -197,3 +197,13 @@ h3,
 .bg-tiger-orange {
     background-color: var(--tiger-orange);
 }
+/* --- Wildlife Marquee Animation --- */
+.wildlife-track {
+    animation: scroll 50s linear infinite; /* Slightly slower for images */
+    width: max-content;
+    will-change: transform;
+}
+
+.wildlife-track:hover {
+    animation-play-state: paused;
+}

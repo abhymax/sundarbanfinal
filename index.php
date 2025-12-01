@@ -149,12 +149,7 @@ try {
 
     </div>
 
-    <div class="absolute bottom-0 left-0 w-full leading-none z-20">
-        <svg class="relative block w-full h-[60px] md:h-[100px]" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 1440 120" preserveAspectRatio="none">
-            <path d="M0,64L48,69.3C96,75,192,85,288,80C384,75,480,53,576,48C672,43,768,53,864,64C960,75,1056,85,1152,80C1248,75,1344,53,1392,42.7L1440,32L1440,120L1392,120C1344,120,1248,120,1152,120C1056,120,960,120,864,120C768,120,672,120,576,120C480,120,384,120,288,120C192,120,96,120,48,120L0,120Z" class="fill-white"></path>
-        </svg>
-    </div>
+    
 </section>
 
 <!-- Who We Are Section -->
@@ -189,8 +184,13 @@ try {
             </div>
 
             <div>
-                <span
-                    class="text-tiger-orange font-bold tracking-widest uppercase text-sm"><?php echo htmlspecialchars($about['tagline']); ?></span>
+                
+                    <div class="inline-flex p-[1px] rounded-full bg-gradient-to-r from-yellow-300 via-orange-400 to-yellow-300 mb-4 shadow-sm">
+                <span class="block px-6 py-1.5 rounded-full bg-[#2E4622] text-tiger-orange font-bold tracking-widest uppercase text-xs">
+                    <?php echo htmlspecialchars($about['tagline']); ?>
+                </span>
+            </div>
+                    
                 <h2 class="text-4xl md:text-5xl font-serif font-bold text-safari-green mt-3 mb-6">
                     <?php echo htmlspecialchars($about['title']); ?>
                 </h2>
@@ -251,49 +251,54 @@ try {
 </section>
 
 <!-- Packages Section -->
-<section class="py-24 bg-gray-50" id="packages">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<section class="py-24 bg-green-50" id="packages">
+    <div class="max-w-[90rem] mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-16">
-            <span class="text-tiger-orange font-bold tracking-widest uppercase text-sm">Curated Itineraries</span>
-            <h2 class="text-4xl md:text-5xl font-serif font-bold text-safari-green mt-3">Choose Your Expedition</h2>
-            <p class="text-gray-500 mt-4 max-w-2xl mx-auto">From quick day escapes to deep jungle immersions, we have
-                designed the perfect route for every traveler.</p>
+            
+            <div class="inline-flex p-[1px] rounded-full bg-gradient-to-r from-yellow-300 via-orange-400 to-yellow-300 mb-4 shadow-sm">
+                <span class="block px-6 py-1.5 rounded-full bg-[#2E4622] text-tiger-orange font-bold tracking-widest uppercase text-xs">
+                    Curated Itineraries
+                </span>
+            </div>
+
+            <h2 class="text-4xl md:text-5xl font-serif font-bold text-safari-green mt-2">Choose Your Expedition</h2>
+            <p class="text-gray-500 mt-4 max-w-2xl mx-auto">From quick day escapes to deep jungle immersions, we have designed the perfect route for every traveler.</p>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <?php if (!empty($packages)): ?>
                 <?php foreach ($packages as $pkg): ?>
-                    <div class="group package-card relative h-[500px] rounded-3xl overflow-hidden cursor-pointer bg-gray-900 shadow-2xl"
+                    <div class="group package-card relative h-[500px] rounded-3xl overflow-hidden cursor-pointer bg-white shadow-xl hover:shadow-2xl transition duration-300 border border-green-100"
                         onclick="window.location.href='<?php echo htmlspecialchars($pkg['slug']); ?>.php'">
+                        
                         <img alt="<?php echo htmlspecialchars($pkg['title']); ?>"
                             class="absolute inset-0 w-full h-full object-cover opacity-90 transition-transform duration-700 group-hover:scale-110"
                             src="<?php echo htmlspecialchars($pkg['image_url']); ?>">
+                        
                         <div class="absolute inset-0 bg-gradient-to-t from-black/95 via-black/30 to-transparent"></div>
 
                         <?php if ($pkg['is_popular']): ?>
-                            <div
-                                class="absolute top-4 right-4 bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full border border-white/20 z-10">
+                            <div class="absolute top-4 right-4 bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full border border-white/20 z-10">
                                 <span class="text-xs font-bold text-white uppercase tracking-wider">Most Popular</span>
                             </div>
                         <?php endif; ?>
+                        
                         <?php if ($pkg['is_bestseller']): ?>
                             <div class="absolute top-4 right-4 bg-tiger-orange px-3 py-1 rounded-full shadow-lg z-10">
                                 <span class="text-xs font-bold text-white uppercase tracking-wider">Best Seller</span>
                             </div>
                         <?php endif; ?>
 
-                        <div class="absolute bottom-0 p-8 w-full z-10">
+                        <div class="absolute bottom-0 p-6 w-full z-10">
                             <div class="transform transition-transform duration-500 translate-y-4 group-hover:translate-y-0">
-                                <span
-                                    class="text-tiger-orange font-bold text-lg mb-1 block">₹<?php echo number_format($pkg['price']); ?>
-                                    / Person</span>
-                                <h3 class="text-3xl font-serif font-bold text-white mb-3">
+                                <span class="text-tiger-orange font-bold text-lg mb-1 block">₹<?php echo number_format($pkg['price']); ?> / Person</span>
+                                <h3 class="text-2xl font-serif font-bold text-white mb-3 leading-tight">
                                     <?php echo htmlspecialchars($pkg['title']); ?>
                                 </h3>
-                                <ul
-                                    class="text-gray-300 text-sm mb-6 space-y-2 opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-75">
+                                <ul class="text-gray-300 text-xs mb-6 space-y-2 opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-75">
                                     <?php
                                     $features = explode(',', $pkg['features']);
+                                    $features = array_slice($features, 0, 2); 
                                     foreach ($features as $feature):
                                         ?>
                                         <li class="flex items-center gap-2">
@@ -302,15 +307,15 @@ try {
                                         </li>
                                     <?php endforeach; ?>
                                 </ul>
-                                <button
-                                    class="block w-full text-center bg-white text-safari-green font-bold py-3 rounded-xl hover:bg-tiger-orange hover:text-white transition">View
-                                    Details</button>
+                                <button class="block w-full text-center bg-white text-safari-green font-bold py-3 rounded-xl hover:bg-tiger-orange hover:text-white transition shadow-lg">
+                                    View Details
+                                </button>
                             </div>
                         </div>
                     </div>
                 <?php endforeach; ?>
             <?php else: ?>
-                <div class="col-span-3 text-center py-10 text-gray-500">
+                <div class="col-span-4 text-center py-10 text-gray-500">
                     No packages available at the moment.
                 </div>
             <?php endif; ?>
@@ -319,92 +324,110 @@ try {
 </section>
 
 <!-- Wildlife Section -->
-<section class="py-24 bg-white" id="wildlife">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="text-center mb-16">
-            <span class="text-tiger-orange font-bold tracking-widest uppercase text-sm">Meet the Locals</span>
-            <h2 class="text-4xl md:text-5xl font-serif font-bold text-safari-green mt-3">Wildlife of Sundarbans</h2>
-            <p class="text-gray-500 mt-4 max-w-2xl mx-auto">The mangrove forests are home to a diverse range of species.</p>
+<section class="py-24 bg-white overflow-hidden relative" id="wildlife">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-12 text-center">
+        
+        <div class="inline-flex p-[1px] rounded-full bg-gradient-to-r from-yellow-300 via-orange-400 to-yellow-300 mb-4 shadow-sm">
+            <span class="block px-6 py-1.5 rounded-full bg-[#2E4622] text-tiger-orange font-bold tracking-widest uppercase text-xs">
+                Meet the Locals
+            </span>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <?php if (!empty($featured_species)): ?>
-                <?php foreach ($featured_species as $species): ?>
-                    <div class="group relative overflow-hidden rounded-2xl shadow-lg aspect-[4/3]">
-                        <img src="<?php echo htmlspecialchars($species['image_url']); ?>" 
-                             alt="<?php echo htmlspecialchars($species['name']); ?>"
-                             class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
-                        <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
-                        <div class="absolute bottom-0 p-6 w-full">
-                            <h3 class="text-2xl font-serif font-bold text-white mb-1"><?php echo htmlspecialchars($species['name']); ?></h3>
-                            <p class="text-gray-300 text-sm line-clamp-2"><?php echo htmlspecialchars($species['description']); ?></p>
-                        </div>
+        <h2 class="text-4xl md:text-5xl font-serif font-bold text-safari-green mt-2">Wildlife of Sundarbans</h2>
+        <p class="text-gray-500 mt-4 max-w-2xl mx-auto">The mangrove forests are home to a diverse range of species.</p>
+    </div>
+
+    <div class="relative w-full">
+        <div class="absolute left-0 top-0 h-full w-20 bg-gradient-to-r from-white to-transparent z-10 pointer-events-none"></div>
+        <div class="absolute right-0 top-0 h-full w-20 bg-gradient-to-l from-white to-transparent z-10 pointer-events-none"></div>
+
+        <div class="wildlife-track flex gap-6 w-max hover:pause-scroll">
+            <?php 
+            // Fallback Data (Matches your screenshot)
+            if (empty($featured_species)) {
+                $featured_species = [
+                    ['name' => 'Royal Bengal Tiger', 'description' => 'The apex predator and soul of the forest.', 'image_url' => 'https://images.unsplash.com/photo-1547971718-d71680108933?q=80&w=1000&auto=format&fit=crop'],
+                    ['name' => 'Estuarine Crocodile', 'description' => 'The largest reptile on the planet.', 'image_url' => 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?q=80&w=1000&auto=format&fit=crop'],
+                    ['name' => 'Spotted Deer', 'description' => 'The graceful beauty of the mangroves.', 'image_url' => 'https://images.unsplash.com/photo-1484406566174-9da00092ee7b?q=80&w=1000&auto=format&fit=crop'],
+                    ['name' => 'Kingfisher', 'description' => 'A flash of blue in the green canopy.', 'image_url' => 'https://images.unsplash.com/photo-1544552866-d3ed42536cfd?q=80&w=1000&auto=format&fit=crop']
+                ];
+            }
+
+            // Duplicate data 4 times to ensure infinite seamless loop
+            $display_species = array_merge($featured_species, $featured_species, $featured_species, $featured_species);
+            
+            foreach ($display_species as $species): 
+            ?>
+                <div class="relative w-[300px] md:w-[350px] h-[450px] rounded-3xl overflow-hidden shrink-0 group cursor-pointer shadow-lg border border-gray-100">
+                    <img src="<?php echo htmlspecialchars($species['image_url']); ?>" 
+                         alt="<?php echo htmlspecialchars($species['name']); ?>"
+                         class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
+                    
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent"></div>
+                    
+                    <div class="absolute bottom-0 p-8 w-full translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
+                        <h3 class="text-2xl font-serif font-bold text-white mb-1"><?php echo htmlspecialchars($species['name']); ?></h3>
+                        <p class="text-gray-300 text-sm font-medium opacity-90"><?php echo htmlspecialchars($species['description']); ?></p>
                     </div>
-                <?php endforeach; ?>
-            <?php else: ?>
-                <div class="col-span-3 text-center text-gray-500">No species featured at the moment.</div>
-            <?php endif; ?>
-        </div>
-        
-        <div class="mt-12 text-center">
-             <a href="species_checklist.php" class="inline-flex items-center gap-2 bg-safari-green text-white px-8 py-3 rounded-full font-bold hover:bg-tiger-orange hover:text-black transition-colors duration-300">
-                <span>View Complete Checklist</span>
-                <span class="material-symbols-outlined">arrow_forward</span>
-            </a>
+                </div>
+            <?php endforeach; ?>
         </div>
     </div>
+    
+    <div class="mt-12 text-center">
+        <a href="species_checklist.php" class="inline-flex items-center gap-2 bg-safari-green text-white px-8 py-3 rounded-full font-bold hover:bg-tiger-orange hover:text-black transition-colors duration-300 shadow-lg">
+           <span>View Complete Checklist</span>
+           <span class="material-symbols-outlined">arrow_forward</span>
+       </a>
+   </div>
 </section>
 
 <!-- Testimonials Section -->
-<section class="py-24 bg-gray-50 overflow-hidden">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-12 text-center">
-        <span class="text-tiger-orange font-bold tracking-widest uppercase text-sm">Guest Reviews</span>
-        <h2 class="text-4xl md:text-5xl font-serif font-bold text-safari-green mt-3">Stories from the Wild</h2>
+<section class="py-24 bg-[#0F1F15] overflow-hidden relative" id="testimonials"> <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-16 text-center relative z-10">
+        <span class="text-[#FFD700] font-bold tracking-widest uppercase text-xs mb-2 block">Guest Diaries</span>
+        <h2 class="text-4xl md:text-5xl font-serif font-bold text-white">Stories from the River</h2>
+        <p class="text-gray-400 mt-4">Join 5000+ happy travelers who explored with us.</p>
     </div>
     
-    <div class="relative w-full overflow-hidden">
-        <div class="flex gap-8 animate-marquee whitespace-nowrap">
-            <?php if (!empty($testimonials)): ?>
-                <?php foreach ($testimonials as $testimonial): ?>
-                    <div class="inline-block w-[400px] bg-white p-8 rounded-2xl shadow-sm whitespace-normal">
-                        <div class="flex items-center gap-1 text-tiger-orange mb-4">
-                            <?php for($i=0; $i<5; $i++): ?>
-                                <span class="material-symbols-outlined text-sm fill-current">star</span>
-                            <?php endfor; ?>
+    <div class="relative w-full">
+        <div class="absolute left-0 top-0 h-full w-20 md:w-40 bg-gradient-to-r from-[#0F1F15] to-transparent z-10 pointer-events-none"></div>
+        <div class="absolute right-0 top-0 h-full w-20 md:w-40 bg-gradient-to-l from-[#0F1F15] to-transparent z-10 pointer-events-none"></div>
+
+        <div class="testimonial-track flex gap-8 w-max">
+            <?php 
+            // If no testimonials in DB, create placeholders
+            if (empty($testimonials)) {
+                $testimonials = [
+                    ['name' => 'Rahul Sen', 'location' => 'Kolkata', 'rating' => 5, 'text' => 'The 2-night package was incredible. The boat was clean and the food was better than most Kolkata restaurants.', 'image_url' => 'https://images.unsplash.com/photo-1531891437562-4301cf35b7e4?q=80&w=200&auto=format&fit=crop'],
+                    ['name' => 'Priya Das', 'location' => 'Mumbai', 'rating' => 5, 'text' => 'A magical experience. The sunset from the boat deck is something I will never forget. Staff was very polite.', 'image_url' => 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=200&auto=format&fit=crop'],
+                    ['name' => 'Amit Roy', 'location' => 'Bangalore', 'rating' => 5, 'text' => 'Saw the Royal Bengal Tiger! The guide was extremely knowledgeable and kept us safe. Highly recommended.', 'image_url' => 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=200&auto=format&fit=crop'],
+                    ['name' => 'Sarah Jenkins', 'location' => 'UK', 'rating' => 5, 'text' => 'The silence of the mangroves is healing. This tour agency organized everything perfectly.', 'image_url' => 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=200&auto=format&fit=crop']
+                ];
+            }
+            
+            // Duplicate array 4 times to ensure infinite scroll fills the screen
+            $display_testimonials = array_merge($testimonials, $testimonials, $testimonials, $testimonials);
+            ?>
+
+            <?php foreach ($display_testimonials as $t): ?>
+                <div class="w-[400px] bg-white/5 backdrop-blur-sm border border-white/10 p-8 rounded-2xl shrink-0 hover:bg-white/10 transition duration-300 select-none">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="w-14 h-14 rounded-full overflow-hidden border-2 border-[#FFD700]">
+                            <?php 
+                                $img = !empty($t['image_url']) ? htmlspecialchars($t['image_url']) : 'https://ui-avatars.com/api/?name=' . urlencode($t['name']) . '&background=random';
+                            ?>
+                            <img src="<?php echo $img; ?>" alt="<?php echo htmlspecialchars($t['name']); ?>" class="w-full h-full object-cover">
                         </div>
-                        <p class="text-gray-600 mb-6 italic">"<?php echo htmlspecialchars($testimonial['content']); ?>"</p>
-                        <div class="flex items-center gap-4">
-                            <div class="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center text-gray-500 font-bold text-xl">
-                                <?php echo substr($testimonial['name'], 0, 1); ?>
-                            </div>
-                            <div>
-                                <h4 class="font-bold text-gray-900"><?php echo htmlspecialchars($testimonial['name']); ?></h4>
-                                <p class="text-xs text-gray-500"><?php echo htmlspecialchars($testimonial['location']); ?></p>
-                            </div>
-                        </div>
-                    </div>
-                <?php endforeach; ?>
-                 <!-- Duplicate for seamless loop -->
-                 <?php foreach ($testimonials as $testimonial): ?>
-                    <div class="inline-block w-[400px] bg-white p-8 rounded-2xl shadow-sm whitespace-normal">
-                        <div class="flex items-center gap-1 text-tiger-orange mb-4">
-                            <?php for($i=0; $i<5; $i++): ?>
-                                <span class="material-symbols-outlined text-sm fill-current">star</span>
-                            <?php endfor; ?>
-                        </div>
-                        <p class="text-gray-600 mb-6 italic">"<?php echo htmlspecialchars($testimonial['content']); ?>"</p>
-                        <div class="flex items-center gap-4">
-                            <div class="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center text-gray-500 font-bold text-xl">
-                                <?php echo substr($testimonial['name'], 0, 1); ?>
-                            </div>
-                            <div>
-                                <h4 class="font-bold text-gray-900"><?php echo htmlspecialchars($testimonial['name']); ?></h4>
-                                <p class="text-xs text-gray-500"><?php echo htmlspecialchars($testimonial['location']); ?></p>
+                        <div>
+                            <h4 class="font-bold text-white text-lg font-serif"><?php echo htmlspecialchars($t['name']); ?></h4>
+                            <div class="flex text-[#FFD700] text-xs gap-0.5">
+                                <?php for($i=0; $i<$t['rating']; $i++) echo '★'; ?>
                             </div>
                         </div>
                     </div>
-                <?php endforeach; ?>
-            <?php endif; ?>
+                    <p class="text-gray-300 italic font-light leading-relaxed">"<?php echo htmlspecialchars($t['text'] ?? $t['content']); ?>"</p>
+                </div>
+            <?php endforeach; ?>
         </div>
     </div>
 </section>

@@ -1,4 +1,6 @@
-// --- 1. Navbar Scroll Effect ---
+// ==========================================
+// 1. NAVBAR SCROLL EFFECT
+// ==========================================
 const navbar = document.getElementById('navbar');
 const logoText = document.getElementById('nav-logo-text');
 const subText = document.getElementById('nav-sub-text');
@@ -57,180 +59,136 @@ window.addEventListener('scroll', () => {
     }
 });
 
-// --- 2. Modal Functions (Global & Robust) ---
-window.openBooking = function() {
-    // Try finding the modal by both possible IDs (New vs Old format)
-    const modal = document.getElementById('bookingModal') || document.getElementById('booking-modal');
-    const sidebar = document.getElementById('bookingSidebar');
-    
-    if(modal) {
-        // Ensure we remove ALL possible hiding classes
-        modal.classList.remove('hidden', 'opacity-0', 'invisible');
-        // Add visibility classes
-        modal.classList.add('opacity-100', 'visible');
-        
-        // If sidebar exists, animate it in
-        if(sidebar) {
-            setTimeout(() => {
-                sidebar.classList.remove('translate-x-full');
-            }, 10);
-        }
-    } else {
-        console.error("Error: Modal not found. Checked for IDs: 'bookingModal' and 'booking-modal'");
-    }
-};
-
-window.closeBooking = function() {
-    const modal = document.getElementById('bookingModal') || document.getElementById('booking-modal');
-    const sidebar = document.getElementById('bookingSidebar');
-    
-    if(modal) {
-        if(sidebar) {
-            sidebar.classList.add('translate-x-full');
-            // Wait for the slide-out animation (300ms) before hiding the element
-            setTimeout(() => {
-                modal.classList.add('hidden');
-                modal.classList.remove('opacity-100', 'visible');
-                modal.classList.add('opacity-0', 'invisible');
-            }, 300);
-        } else {
-            // No sidebar? Hide immediately
-            modal.classList.add('hidden');
-        }
-    }
-};
-
-// --- 3. FAQ & Init Logic ---
+// ==========================================
+// 2. FAQ TOGGLE FUNCTION
+// ==========================================
 function toggleFaq(element) {
     const item = element.parentElement;
     const wasActive = item.classList.contains('active');
-    document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('active'));
-    if (!wasActive) item.classList.add('active');
+
+    document.querySelectorAll('.faq-item').forEach(i => {
+        i.classList.remove('active');
+    });
+
+    if (!wasActive) {
+        item.classList.add('active');
+    }
 }
 
+// ==========================================
+// 3. PAGE INITIALIZATION (Map & GSAP)
+// ==========================================
 window.addEventListener('load', () => {
-    // GSAP
+    // GSAP Animations
     if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
         gsap.registerPlugin(ScrollTrigger);
         ScrollTrigger.refresh();
-        gsap.to("header h1", { scrollTrigger: { trigger: "header", start: "top top", scrub: true }, y: 50, opacity: 0.8 });
-        gsap.from(".package-card", { scrollTrigger: { trigger: "#packages", start: "top 85%" }, y: 50, opacity: 0, duration: 0.8, stagger: 0.2, ease: "power2.out", clearProps: "all" });
-        gsap.from("#testimonials", { scrollTrigger: { trigger: "#testimonials", start: "top 85%" }, y: 50 });
+
+        if (document.querySelector("header h1")) {
+            gsap.to("header h1", {
+                scrollTrigger: { trigger: "header", start: "top top", scrub: true },
+                y: 50, opacity: 0.8
+            });
+        }
+
+        const cards = document.querySelectorAll(".package-card");
+        if (cards.length > 0) {
+            gsap.from(cards, {
+                scrollTrigger: { trigger: "#packages", start: "top 85%" },
+                y: 50, opacity: 0, duration: 0.8, stagger: 0.2, ease: "power2.out", clearProps: "all"
+            });
+        }
+
+        if (document.getElementById("testimonials")) {
+            gsap.from("#testimonials", {
+                scrollTrigger: { trigger: "#testimonials", start: "top 85%" },
+                y: 50
+            });
+        }
     }
 
-    // Google Map (Simplified for safety)
+    // Google Map Logic
     async function initMap() {
         const mapElement = document.getElementById("map");
-        if (!mapElement || typeof google === 'undefined') return;
-        
-        // Safety check for maps library
+        if (!mapElement) return;
+        if (typeof google === 'undefined') return;
+
         try {
-            const { Map } = await google.maps.importLibrary("maps");
+            const { Map, InfoWindow } = await google.maps.importLibrary("maps");
             const { AdvancedMarkerElement, PinElement } = await google.maps.importLibrary("marker");
             const { Polyline } = await google.maps.importLibrary("maps");
 
-            const map = new Map(mapElement, { 
-                center: { lat: 22.35, lng: 88.60 }, 
-                zoom: 9, 
-                mapId: 'SUNDARBAN_MAP_ID', 
-                disableDefaultUI: true 
+            const map = new Map(mapElement, {
+                center: { lat: 22.35, lng: 88.60 },
+                zoom: 9,
+                mapId: 'SUNDARBAN_MAP_ID',
+                gestureHandling: 'greedy',
+                disableDefaultUI: true,
+                zoomControl: true
+            });
+
+            const locations = [
+                { pos: { lat: 22.565, lng: 88.352 }, title: "Pickup: Esplanade", type: "pickup" },
+                { pos: { lat: 22.544, lng: 88.399 }, title: "Pickup: Science City", type: "pickup" },
+                { pos: { lat: 22.166, lng: 88.797 }, title: "Godkhali Ferry Ghat", type: "boat" },
+                { pos: { lat: 22.120, lng: 88.830 }, title: "Sajnekhali Watch Tower", type: "wildlife" },
+                { pos: { lat: 22.100, lng: 88.800 }, title: "Sudhanyakhali Watch Tower", type: "wildlife" }
+            ];
+
+            const infoWindow = new InfoWindow();
+
+            locations.forEach(loc => {
+                let bgColor = loc.type === "boat" ? "#4285F4" : loc.type === "wildlife" ? "#34A853" : "#EA4335";
+                let glyphIcon = loc.type === "boat" ? "sailing" : loc.type === "wildlife" ? "visibility" : "directions_car";
+
+                const glyph = document.createElement("span");
+                glyph.className = "material-symbols-outlined";
+                glyph.textContent = glyphIcon;
+                glyph.style.color = "white";
+                glyph.style.fontSize = "16px";
+
+                const pin = new PinElement({ glyph: glyph, background: bgColor, borderColor: "white", scale: 1.2 });
+                const marker = new AdvancedMarkerElement({ map, position: loc.pos, content: pin.element, title: loc.title });
+
+                marker.addListener('click', () => {
+                    infoWindow.setContent(`<div style="padding:5px"><strong>${loc.title}</strong></div>`);
+                    infoWindow.open(map, marker);
+                });
             });
             
-            // Route drawing logic (kept brief to focus on modal fix)
+             // Draw Routes
             const roadPath = new Polyline({
-                path: [{ lat: 22.565, lng: 88.352 }, { lat: 22.166, lng: 88.797 }],
-                geodesic: true, strokeColor: "#FF5722", strokeOpacity: 0.8, strokeWeight: 4, map: map
+                path: [
+                    { lat: 22.565, lng: 88.352 }, // Esplanade
+                    { lat: 22.544, lng: 88.399 }, // Science City
+                    { lat: 22.45, lng: 88.50 }, 
+                    { lat: 22.30, lng: 88.65 }, 
+                    { lat: 22.166, lng: 88.797 }  // Godkhali
+                ],
+                geodesic: true,
+                strokeColor: "#FF5722",
+                strokeOpacity: 0.8,
+                strokeWeight: 4,
+                map: map
             });
+
+            const boatPath = new Polyline({
+                path: [
+                    { lat: 22.166, lng: 88.797 }, // Godkhali
+                    { lat: 22.14, lng: 88.81 }, 
+                    { lat: 22.120, lng: 88.830 }, // Sajnekhali
+                    { lat: 22.100, lng: 88.800 }  // Sudhanyakhali
+                ],
+                geodesic: true,
+                strokeColor: "#0288D1",
+                strokeOpacity: 0.8,
+                strokeWeight: 4,
+                map: map
+            });
+
         } catch (e) {
-            console.log("Map init skipped or failed: ", e);
+            console.warn("Map init failed or library missing:", e);
         }
     }
     initMap();
-});
-
-// --- 4. Connect Hero Button & Submit Logic ---
-document.addEventListener('DOMContentLoaded', function () {
-    
-    // Connect Hero Button to Modal
-    const heroBtn = document.getElementById('hero-check-btn');
-    if(heroBtn) {
-        heroBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            
-            // Transfer Data
-            const hDate = document.getElementById('hero-date')?.value;
-            const hGuests = document.getElementById('hero-guests')?.value;
-            const hPackage = document.getElementById('hero-package')?.value;
-
-            const mDate = document.getElementById('modal-date');
-            const mTravelers = document.getElementById('modal-travelers');
-            const mPackage = document.getElementById('modal-package');
-
-            if(hDate && mDate) mDate.value = hDate;
-            if(hGuests && mTravelers) mTravelers.value = hGuests;
-            if(hPackage && hPackage !== 'All Packages' && mPackage) mPackage.value = hPackage;
-
-            window.openBooking();
-        });
-    }
-
-    // Form Submission with Captcha
-    // Check for both ID variations just in case
-    const form = document.getElementById('booking-form') || document.getElementById('bookingForm');
-    
-    if(form) {
-        form.addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const btn = document.getElementById('submit-btn');
-            const statusBox = document.getElementById('form-status');
-            const originalText = btn ? btn.innerHTML : 'Send';
-
-            if(btn) {
-                btn.disabled = true;
-                btn.innerHTML = 'Sending...';
-                btn.classList.add('opacity-75');
-            }
-
-            const formData = new FormData(form);
-
-            fetch('submit_booking.php', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                if(statusBox) {
-                    statusBox.classList.remove('hidden', 'bg-green-100', 'text-green-700', 'bg-red-100', 'text-red-700');
-                    statusBox.style.display = 'block';
-
-                    if(data.status === 'success') {
-                        statusBox.classList.add('bg-green-100', 'text-green-700');
-                        statusBox.innerHTML = '✓ ' + data.message;
-                        form.reset();
-                        setTimeout(() => { window.closeBooking(); statusBox.style.display = 'none'; }, 3000);
-                    } else {
-                        statusBox.classList.add('bg-red-100', 'text-red-700');
-                        statusBox.innerHTML = '⚠️ ' + data.message;
-                    }
-                } else {
-                    alert(data.message);
-                }
-            })
-            .catch(err => {
-                if(statusBox) {
-                    statusBox.classList.add('bg-red-100', 'text-red-700');
-                    statusBox.style.display = 'block';
-                    statusBox.innerHTML = '⚠️ Network error. Please check connection.';
-                }
-            })
-            .finally(() => {
-                if(btn) {
-                    btn.disabled = false;
-                    btn.innerHTML = originalText;
-                    btn.classList.remove('opacity-75');
-                }
-            });
-        });
-    }
 });
