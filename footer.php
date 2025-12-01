@@ -118,11 +118,14 @@ try {
                 </button>
             </div>
 
-            <form class="space-y-6" id="bookingForm" onsubmit="submitBooking(event)">
+            <div id="form-status" class="hidden p-4 mb-6 rounded-xl text-sm font-medium border"></div>
+
+            <form class="space-y-6" id="booking-form">
                 <div>
                     <label class="block text-sm font-bold text-gray-700 mb-2">Select Package</label>
-                    <select name="package"
+                    <select name="package" id="modal-package"
                         class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-tiger-orange transition">
+                        <option value="Custom Tour">Select a Package</option>
                         <option value="1 Day Tour">1 Day Sundarban Tour</option>
                         <option value="1 Night 2 Days">1 Night 2 Days Adventure</option>
                         <option value="2 Nights 3 Days">2 Nights 3 Days Safari</option>
@@ -132,17 +135,17 @@ try {
                 <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label class="block text-sm font-bold text-gray-700 mb-2">Travel Date</label>
-                        <input type="date" name="date" required
+                        <input type="date" name="date" id="modal-date" required
                             class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-tiger-orange transition">
                     </div>
                     <div>
                         <label class="block text-sm font-bold text-gray-700 mb-2">Travelers</label>
-                        <select name="travelers"
+                        <select name="travelers" id="modal-travelers"
                             class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-tiger-orange transition">
-                            <option>2 Adults</option>
-                            <option>3 Adults</option>
-                            <option>4+ Adults</option>
-                            <option>Large Group</option>
+                            <option value="2">2 Adults</option>
+                            <option value="3">3 Adults</option>
+                            <option value="4">4+ Adults</option>
+                            <option value="6">Large Group</option>
                         </select>
                     </div>
                 </div>
@@ -161,18 +164,28 @@ try {
 
                 <div>
                     <label class="block text-sm font-bold text-gray-700 mb-2">Email Address</label>
-                    <input type="email" name="email" placeholder="john@example.com" required
+                    <input type="email" name="email" placeholder="john@example.com"
                         class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-tiger-orange transition">
                 </div>
 
-                <button type="submit"
+                <?php 
+                    $num1 = rand(1, 9);
+                    $num2 = rand(1, 9);
+                    $_SESSION['captcha_result'] = $num1 + $num2;
+                ?>
+                <div class="bg-orange-50 p-4 rounded-xl border border-orange-100 flex items-center justify-between">
+                    <label class="text-sm font-bold text-gray-700">Security Check: <span class="text-orange-600"><?php echo $num1; ?> + <?php echo $num2; ?> = ?</span></label>
+                    <input type="number" name="captcha" required class="w-20 bg-white border border-gray-300 rounded-lg px-3 py-2 text-center font-bold text-lg focus:outline-none focus:ring-2 focus:ring-tiger-orange">
+                </div>
+
+                <button type="submit" id="submit-btn"
                     class="w-full bg-tiger-orange text-black font-bold py-4 rounded-xl hover:bg-orange-400 transition shadow-lg flex items-center justify-center gap-2">
                     <span>Confirm Booking Request</span>
                     <span class="material-symbols-outlined">arrow_forward</span>
                 </button>
 
                 <p class="text-xs text-center text-gray-400">
-                    No payment required now. We'll contact you to confirm availability.
+                    <span class="material-symbols-outlined text-[12px] align-middle">lock</span> Your details are secure. No payment needed now.
                 </p>
             </form>
         </div>

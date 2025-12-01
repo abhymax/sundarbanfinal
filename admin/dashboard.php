@@ -1,188 +1,132 @@
 <?php
-session_start();
-
-// Security Check
-if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
-    header('Location: login.php');
-    exit;
-}
-
+// Note: Session check is now in header.php
 require_once '../db_connect.php';
+include 'header.php'; // USES THE NEW SHARED HEADER
 
-// Fetch Bookings
+// Fetch Stats
 try {
-    $stmt = $pdo->query("SELECT * FROM bookings ORDER BY created_at DESC LIMIT 5");
-    $bookings = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $total_bookings = $pdo->query("SELECT COUNT(*) FROM bookings")->fetchColumn();
+    $total_packages = $pdo->query("SELECT COUNT(*) FROM packages")->fetchColumn();
+    $recent_bookings = $pdo->query("SELECT * FROM bookings ORDER BY created_at DESC LIMIT 10")->fetchAll(PDO::FETCH_ASSOC);
 } catch (PDOException $e) {
-    $bookings = [];
-    $error = "Error fetching bookings: " . $e->getMessage();
-}
-
-// Fetch Total Bookings Count
-try {
-    $stmt = $pdo->query("SELECT COUNT(*) FROM bookings");
-    $total_bookings = $stmt->fetchColumn();
-} catch (PDOException $e) {
-    $total_bookings = 0;
+    $total_bookings = 0; $total_packages = 0; $recent_bookings = [];
 }
 ?>
-<!DOCTYPE html>
-<html lang="en">
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard | Sundarban Boat Safari</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
-</head>
-
-<body class="bg-gray-100">
-    <div class="flex min-h-screen">
-        <!-- Sidebar -->
-        <aside class="w-64 bg-gray-900 text-white min-h-screen hidden md:block">
-            <div class="p-6">
-                <h2 class="text-2xl font-bold text-orange-500">Admin Panel</h2>
-            </div>
-            <nav class="mt-6">
-                <a href="dashboard.php" class="block py-3 px-6 bg-gray-800 border-l-4 border-orange-500">Dashboard</a>
-                <a href="manage_packages.php" class="block py-3 px-6 hover:bg-gray-800">Packages</a>
-                <a href="manage_home_about.php" class="block py-3 px-6 hover:bg-gray-800">Who We Are</a>
-                <a href="manage_species.php" class="block py-3 px-6 hover:bg-gray-800">Wildlife</a>
-                <a href="manage_faqs.php" class="block py-3 px-6 hover:bg-gray-800">FAQs</a>
-                <a href="manage_footer.php" class="block py-3 px-6 hover:bg-gray-800">Footer</a>
-                <a href="settings.php" class="block py-3 px-6 hover:bg-gray-800">General Settings</a>
-                <a href="manage_menu.php" class="block py-3 px-6 hover:bg-gray-800">Manage Menu</a>
-                <a href="logout.php" class="block py-3 px-6 hover:bg-red-600 mt-10">Logout</a>
-            </nav>
-        </aside>
-
-        <!-- Main Content -->
-        <main class="flex-1 p-8">
-            <div class="flex justify-between items-center mb-8">
-                <h1 class="text-3xl font-bold text-gray-800">Dashboard</h1>
-                <div class="flex items-center gap-4">
-                    <span class="text-gray-600">Welcome, Admin</span>
-                    <a href="../index.php" target="_blank" class="text-blue-600 hover:underline">View Site</a>
-                </div>
-            </div>
-
-            <!-- Stats Cards -->
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200 flex items-center gap-4">
-                    <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center text-blue-600">
-                        <span class="material-symbols-outlined">book_online</span>
-                    </div>
-                    <div>
-                        <p class="text-sm text-gray-500">Total Bookings</p>
-                        <p class="text-2xl font-bold text-gray-800"><?php echo $total_bookings; ?></p>
-                    </div>
-                </div>
-                <!-- Add more stats here if needed -->
-            </div>
-
-            <!-- Quick Actions Grid -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                <a href="manage_packages.php"
-                    class="bg-white p-6 rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition group">
-                    <div class="flex items-center justify-between mb-2">
-                        <h3 class="font-bold text-gray-800">Manage Packages</h3>
-                        <span
-                            class="material-symbols-outlined text-gray-400 group-hover:text-orange-500 transition">arrow_forward</span>
-                    </div>
-                    <p class="text-sm text-gray-500">Add, edit, or remove tour packages.</p>
-                </a>
-
-                <a href="manage_home_about.php"
-                    class="bg-white p-6 rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition group">
-                    <div class="flex items-center justify-between mb-2">
-                        <h3 class="font-bold text-gray-800">Who We Are</h3>
-                        <span
-                            class="material-symbols-outlined text-gray-400 group-hover:text-orange-500 transition">arrow_forward</span>
-                    </div>
-                    <p class="text-sm text-gray-500">Update the 'Who We Are' section.</p>
-                </a>
-                
-                 <a href="manage_species.php"
-                    class="bg-white p-6 rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition group">
-                    <div class="flex items-center justify-between mb-2">
-                        <h3 class="font-bold text-gray-800">Manage Wildlife</h3>
-                        <span
-                            class="material-symbols-outlined text-gray-400 group-hover:text-orange-500 transition">arrow_forward</span>
-                    </div>
-                    <p class="text-sm text-gray-500">Add or edit featured species.</p>
-                </a>
-            </div>
-
-            <!-- Recent Bookings Table -->
-            <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                <div class="p-6 border-b border-gray-200 flex justify-between items-center">
-                    <h3 class="font-bold text-gray-800 text-lg">Recent Bookings</h3>
-                    <a href="#" class="text-sm text-blue-600 hover:underline">View All</a>
-                </div>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-sm text-left text-gray-500 whitespace-nowrap">
-                        <thead class="text-xs text-gray-700 uppercase bg-gray-50">
-                            <tr>
-                                <th scope="col" class="px-6 py-3">Date</th>
-                                <th scope="col" class="px-6 py-3">Customer</th>
-                                <th scope="col" class="px-6 py-3">Package</th>
-                                <th scope="col" class="px-6 py-3">Pax</th>
-                                <th scope="col" class="px-6 py-3">Status</th>
-                                <th scope="col" class="px-6 py-3">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php if (empty($bookings)): ?>
-                                <tr>
-                                    <td colspan="6" class="px-6 py-4 text-center text-gray-500">
-                                        No bookings found.
-                                    </td>
-                                </tr>
-                            <?php else: ?>
-                                <?php foreach ($bookings as $booking): ?>
-                                    <tr class="bg-white border-b hover:bg-gray-50">
-                                        <td class="px-6 py-4">
-                                            <?php echo htmlspecialchars($booking['travel_date']); ?>
-                                        </td>
-                                        <td class="px-6 py-4 font-medium text-gray-900">
-                                            <?php echo htmlspecialchars($booking['name']); ?><br>
-                                            <span
-                                                class="text-xs text-gray-400"><?php echo htmlspecialchars($booking['phone']); ?></span>
-                                        </td>
-                                        <td class="px-6 py-4">
-                                            <?php echo htmlspecialchars($booking['package_name'] ?? ''); ?>
-                                        </td>
-                                        <td class="px-6 py-4">
-                                            <?php echo htmlspecialchars($booking['adults']); ?> Ad,
-                                            <?php echo htmlspecialchars($booking['children']); ?> Ch
-                                        </td>
-                                        <td class="px-6 py-4">
-                                            <?php if ($booking['status'] == 'confirmed'): ?>
-                                                <span
-                                                    class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded">Confirmed</span>
-                                            <?php else: ?>
-                                                <span
-                                                    class="bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-0.5 rounded">Pending</span>
-                                            <?php endif; ?>
-                                        </td>
-                                        <td class="px-6 py-4">
-                                            <?php if ($booking['status'] != 'confirmed'): ?>
-                                                <a href="update_status.php?id=<?php echo $booking['id']; ?>&status=confirmed"
-                                                    class="font-medium text-blue-600 hover:underline">Confirm</a>
-                                            <?php else: ?>
-                                                <span class="text-gray-400">-</span>
-                                            <?php endif; ?>
-                                        </td>
-                                    </tr>
-                                <?php endforeach; ?>
-                            <?php endif; ?>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </main>
+<div class="max-w-7xl mx-auto">
+    <div class="flex justify-between items-end mb-8">
+        <div>
+            <h1 class="text-4xl font-bold text-safari-dark font-serif">Dashboard</h1>
+            <p class="text-gray-500 mt-2">Welcome back to the Leads Centre.</p>
+        </div>
+        <div class="text-right">
+            <span class="inline-block px-4 py-2 rounded-lg bg-green-100 text-safari-green font-bold text-sm">
+                <?php echo date('l, d M Y'); ?>
+            </span>
+        </div>
     </div>
-</body>
 
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 relative overflow-hidden group">
+            <div class="absolute right-0 top-0 w-32 h-32 bg-tiger-yellow/10 rounded-bl-full -mr-10 -mt-10 transition-transform group-hover:scale-110"></div>
+            <div class="relative z-10">
+                <p class="text-sm font-bold text-gray-500 uppercase tracking-wider">Total Inquiries</p>
+                <div class="flex items-end gap-3 mt-2">
+                    <h2 class="text-4xl font-bold text-safari-dark"><?php echo $total_bookings; ?></h2>
+                    <span class="mb-1 text-sm text-green-600 font-medium">+ New</span>
+                </div>
+            </div>
+            <div class="mt-4 w-10 h-10 rounded-full bg-tiger-yellow flex items-center justify-center text-safari-dark shadow-sm">
+                <span class="material-symbols-outlined">groups</span>
+            </div>
+        </div>
+
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 relative overflow-hidden group">
+            <div class="absolute right-0 top-0 w-32 h-32 bg-safari-green/10 rounded-bl-full -mr-10 -mt-10 transition-transform group-hover:scale-110"></div>
+            <div class="relative z-10">
+                <p class="text-sm font-bold text-gray-500 uppercase tracking-wider">Active Packages</p>
+                <div class="flex items-end gap-3 mt-2">
+                    <h2 class="text-4xl font-bold text-safari-dark"><?php echo $total_packages; ?></h2>
+                    <span class="mb-1 text-sm text-gray-400 font-medium">Live</span>
+                </div>
+            </div>
+            <div class="mt-4 w-10 h-10 rounded-full bg-safari-green flex items-center justify-center text-white shadow-sm">
+                <span class="material-symbols-outlined">tour</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="bg-white rounded-2xl shadow-lg shadow-gray-200/50 border border-gray-100 overflow-hidden">
+        <div class="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
+            <h3 class="text-lg font-bold text-safari-dark flex items-center gap-2">
+                <span class="material-symbols-outlined text-tiger-yellow">list_alt</span> Recent Leads
+            </h3>
+            <button class="text-sm text-safari-green font-bold hover:underline">View All</button>
+        </div>
+        
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="bg-gray-50 text-gray-500 text-xs uppercase tracking-wider">
+                        <th class="px-6 py-4 font-bold">Date</th>
+                        <th class="px-6 py-4 font-bold">Customer</th>
+                        <th class="px-6 py-4 font-bold">Package</th>
+                        <th class="px-6 py-4 font-bold">Travelers</th>
+                        <th class="px-6 py-4 font-bold">Status</th>
+                        <th class="px-6 py-4 font-bold text-right">Action</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100 text-sm">
+                    <?php if (empty($recent_bookings)): ?>
+                        <tr><td colspan="6" class="px-6 py-8 text-center text-gray-400 italic">No inquiries received yet.</td></tr>
+                    <?php else: ?>
+                        <?php foreach ($recent_bookings as $b): ?>
+                            <tr class="hover:bg-yellow-50/50 transition-colors group">
+                                <td class="px-6 py-4 text-gray-500 whitespace-nowrap">
+                                    <?php echo date('d M, Y', strtotime($b['travel_date'])); ?>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="font-bold text-gray-900"><?php echo htmlspecialchars($b['name']); ?></div>
+                                    <div class="text-xs text-gray-500 font-mono"><?php echo htmlspecialchars($b['phone']); ?></div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="inline-block bg-blue-50 text-blue-700 px-2 py-1 rounded text-xs font-bold border border-blue-100">
+                                        <?php echo htmlspecialchars($b['package_name']); ?>
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 text-gray-600">
+                                    <span class="font-bold"><?php echo $b['adults']; ?></span> Adults 
+                                    <?php if($b['children'] > 0): ?> + <?php echo $b['children']; ?> Kids<?php endif; ?>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <?php if ($b['status'] == 'confirmed'): ?>
+                                        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-green-100 text-green-700 border border-green-200">
+                                            <span class="w-2 h-2 rounded-full bg-green-500"></span> Confirmed
+                                        </span>
+                                    <?php else: ?>
+                                        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-yellow-100 text-yellow-800 border border-yellow-200">
+                                            <span class="w-2 h-2 rounded-full bg-yellow-500 animate-pulse"></span> Pending
+                                        </span>
+                                    <?php endif; ?>
+                                </td>
+                                <td class="px-6 py-4 text-right">
+                                    <?php if ($b['status'] != 'confirmed'): ?>
+                                        <a href="update_status.php?id=<?php echo $b['id']; ?>&status=confirmed" 
+                                           class="inline-block p-2 rounded-lg bg-white border border-gray-200 text-gray-400 hover:text-green-600 hover:border-green-600 shadow-sm transition" title="Mark Confirmed">
+                                            <span class="material-symbols-outlined text-lg">check</span>
+                                        </a>
+                                    <?php endif; ?>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+</main>
+</div>
+</body>
 </html>

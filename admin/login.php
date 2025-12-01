@@ -1,88 +1,59 @@
 <?php
 session_start();
-
-// Redirect if already logged in
 if (isset($_SESSION['admin_logged_in']) && $_SESSION['admin_logged_in'] === true) {
-    header('Location: dashboard.php');
-    exit;
+    header('Location: dashboard.php'); exit;
 }
-
 $error = '';
-
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $username = $_POST['username'] ?? '';
-    $password = $_POST['password'] ?? '';
-
-    // Hardcoded credentials as requested
-    if ($username === 'admin' && $password === 'sundarban123') {
-        $_SESSION['admin_logged_in'] = true;
-        header('Location: dashboard.php');
-        exit;
-    } else {
-        $error = 'Invalid username or password';
-    }
+    if ($_POST['username'] === 'admin' && $_POST['password'] === 'sundarban123') {
+        $_SESSION['admin_logged_in'] = true; header('Location: dashboard.php'); exit;
+    } else { $error = 'Invalid credentials'; }
 }
 ?>
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Login - Sundarban Boat Safari</title>
+    <title>Admin Login</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-        }
-    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
 </head>
+<body class="bg-[#051105] h-screen flex items-center justify-center relative overflow-hidden">
+    
+    <div class="absolute top-0 left-0 w-96 h-96 bg-[#2E4622] rounded-full blur-[120px] opacity-30 -translate-x-1/2 -translate-y-1/2"></div>
+    <div class="absolute bottom-0 right-0 w-96 h-96 bg-[#FFD700] rounded-full blur-[120px] opacity-10 translate-x-1/2 translate-y-1/2"></div>
 
-<body class="bg-gray-100 h-screen flex items-center justify-center">
-
-    <div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md">
+    <div class="bg-white/5 backdrop-blur-xl border border-white/10 p-10 rounded-2xl shadow-2xl w-full max-w-sm relative z-10">
         <div class="text-center mb-8">
-            <h1 class="text-2xl font-bold text-gray-800">Admin Login</h1>
-            <p class="text-gray-500 text-sm mt-2">Sundarban Boat Safari</p>
+            <div class="w-16 h-16 bg-[#FFD700] rounded-full flex items-center justify-center text-[#051105] mx-auto mb-4 text-2xl font-bold shadow-lg shadow-yellow-500/20">
+                <span class="font-serif">S</span>
+            </div>
+            <h1 class="text-3xl font-serif font-bold text-white">Welcome Back</h1>
+            <p class="text-gray-400 text-sm mt-2">Sundarban Boat Safari Admin</p>
         </div>
 
         <?php if ($error): ?>
-            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
-                <span class="block sm:inline"><?php echo htmlspecialchars($error); ?></span>
+            <div class="bg-red-500/10 border border-red-500/50 text-red-200 px-4 py-3 rounded-lg mb-6 text-sm text-center">
+                <?php echo htmlspecialchars($error); ?>
             </div>
         <?php endif; ?>
 
-        <form method="POST" action="">
-            <div class="mb-4">
-                <label class="block text-gray-700 text-sm font-bold mb-2" for="username">
-                    Username
-                </label>
-                <input
-                    class="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-green-500"
-                    id="username" name="username" type="text" placeholder="Enter username" required>
+        <form method="POST" class="space-y-6">
+            <div>
+                <label class="block text-gray-400 text-xs font-bold uppercase tracking-wider mb-2">Username</label>
+                <input class="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-gray-600 focus:outline-none focus:border-[#FFD700] transition" 
+                       name="username" type="text" placeholder="admin" required>
             </div>
-            <div class="mb-6">
-                <label class="block text-gray-700 text-sm font-bold mb-2" for="password">
-                    Password
-                </label>
-                <input
-                    class="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 mb-3 leading-tight focus:outline-none focus:ring-2 focus:ring-green-500"
-                    id="password" name="password" type="password" placeholder="******************" required>
+            <div>
+                <label class="block text-gray-400 text-xs font-bold uppercase tracking-wider mb-2">Password</label>
+                <input class="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-gray-600 focus:outline-none focus:border-[#FFD700] transition" 
+                       name="password" type="password" placeholder="••••••••" required>
             </div>
-            <div class="flex items-center justify-between">
-                <button
-                    class="w-full bg-green-700 hover:bg-green-800 text-white font-bold py-3 px-4 rounded focus:outline-none focus:shadow-outline transition duration-300"
-                    type="submit">
-                    Sign In
-                </button>
-            </div>
+            <button class="w-full bg-[#FFD700] hover:bg-yellow-400 text-[#051105] font-bold py-3 rounded-lg transition-transform transform active:scale-95 shadow-lg">
+                Sign In
+            </button>
         </form>
-        <div class="text-center mt-6">
-            <a href="../index.php" class="text-sm text-gray-500 hover:text-gray-800">Back to Website</a>
-        </div>
     </div>
-
 </body>
-
 </html>

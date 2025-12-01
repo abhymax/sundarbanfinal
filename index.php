@@ -97,50 +97,62 @@ try {
         <div class="absolute inset-0 bg-black/40"></div>
     </div>
 
-    <!-- Content -->
-    <div class="relative z-10 text-center text-white px-4 max-w-4xl mx-auto mt-20">
-        <div class="mb-6 flex justify-center">
-            <span
-                class="px-4 py-1.5 rounded-full border border-white/30 bg-white/10 backdrop-blur-md text-sm font-medium tracking-wider uppercase">
-                Explore Our Tour Packages
-            </span>
-        </div>
-        <h1 class="font-serif text-5xl md:text-7xl lg:text-8xl font-bold mb-6 leading-tight">
+    <div class="relative z-10 text-center text-white px-4 max-w-6xl mx-auto mt-16">
+        <h1 class="font-serif text-4xl md:text-6xl font-bold mb-4 leading-tight drop-shadow-lg">
             <?php echo htmlspecialchars($hero['title']); ?>
         </h1>
-        <p class="text-lg md:text-xl text-gray-200 mb-10 max-w-2xl mx-auto font-light tracking-wide">
+        <p class="text-lg md:text-xl text-gray-100 mb-10 max-w-2xl mx-auto font-light tracking-wide drop-shadow-md">
             <?php echo htmlspecialchars($hero['subtitle']); ?>
         </p>
 
-        <!-- Enquiry Form -->
-        <div class="bg-white/10 backdrop-blur-md p-6 rounded-2xl max-w-2xl mx-auto mt-8 border border-white/20">
-            <h3 class="text-xl font-bold mb-4 text-white">Quick Enquiry</h3>
-            <form action="submit_inquiry.php" method="POST" class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <input type="text" name="name" placeholder="Your Name" required
-                    class="bg-white/80 border-0 rounded-lg px-4 py-3 text-gray-900 placeholder-gray-500 focus:ring-2 focus:ring-tiger-orange focus:bg-white transition">
-                <input type="tel" name="phone" placeholder="Phone Number" required
-                    class="bg-white/80 border-0 rounded-lg px-4 py-3 text-gray-900 placeholder-gray-500 focus:ring-2 focus:ring-tiger-orange focus:bg-white transition">
-                <button type="submit"
-                    class="bg-tiger-orange text-black font-bold py-3 rounded-lg hover:bg-white hover:text-tiger-orange transition duration-300 flex items-center justify-center gap-2">
-                    <span>Send Request</span>
-                    <span class="material-symbols-outlined text-sm">send</span>
+        <div class="glass-card rounded-2xl p-4 md:p-6 max-w-5xl mx-auto shadow-2xl border-t border-white/40 hidden md:block mb-8 bg-white/90 backdrop-blur-xl">
+            <div class="grid grid-cols-4 gap-4 items-center">
+                <div class="text-left border-r border-gray-300 px-4">
+                    <label class="block text-[10px] uppercase text-gray-500 font-bold mb-1 tracking-wider">Date</label>
+                    <input id="hero-date" class="bg-transparent text-gray-900 font-bold w-full outline-none cursor-pointer placeholder-gray-500" type="date">
+                </div>
+                
+                <div class="text-left border-r border-gray-300 px-4">
+                    <label class="block text-[10px] uppercase text-gray-500 font-bold mb-1 tracking-wider">Guests</label>
+                    <select id="hero-guests" class="bg-transparent text-gray-900 font-bold w-full outline-none cursor-pointer">
+                        <option value="2">2 Travelers</option>
+                        <option value="3">3 Travelers</option>
+                        <option value="4">4 Travelers</option>
+                        <option value="6">6+ Group</option>
+                    </select>
+                </div>
+
+                <div class="text-left border-r border-gray-300 px-4">
+                    <label class="block text-[10px] uppercase text-gray-500 font-bold mb-1 tracking-wider">Package</label>
+                    <select id="hero-package" class="bg-transparent text-gray-900 font-bold w-full outline-none cursor-pointer">
+                        <option value="All Packages">All Packages</option>
+                        <?php foreach ($packages as $pkg): ?>
+                            <option value="<?php echo htmlspecialchars($pkg['title']); ?>">
+                                <?php echo htmlspecialchars($pkg['title']); ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+
+                <button id="hero-check-btn" class="bg-[#2E4622] text-white h-12 rounded-xl font-bold hover:bg-[#1a2e1a] transition flex items-center justify-center gap-2 shadow-lg transform hover:-translate-y-0.5 text-sm uppercase tracking-wide">
+                    Check Availability
                 </button>
-            </form>
+            </div>
         </div>
+
+        <div class="mt-8">
+            <button onclick="openBooking()" class="bg-[#FFD700] text-black px-10 py-4 rounded-full font-bold text-lg hover:bg-yellow-400 transition inline-flex items-center gap-2 group shadow-xl hover:shadow-2xl transform hover:-translate-y-1">
+                Plan Your Trip
+                <span class="material-symbols-outlined group-hover:translate-x-1 transition-transform">arrow_forward</span>
+            </button>
+        </div>
+
     </div>
 
-    <!-- Scroll Indicator -->
-    <div class="absolute bottom-10 left-1/2 transform -translate-x-1/2 animate-bounce text-white">
-        <span class="material-symbols-outlined text-4xl">keyboard_arrow_down</span>
-    </div>
-
-    <!-- Bottom Wave -->
     <div class="absolute bottom-0 left-0 w-full leading-none z-20">
         <svg class="relative block w-full h-[60px] md:h-[100px]" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 1440 120" preserveAspectRatio="none">
-            <path
-                d="M0,64L48,69.3C96,75,192,85,288,80C384,75,480,53,576,48C672,43,768,53,864,64C960,75,1056,85,1152,80C1248,75,1344,53,1392,42.7L1440,32L1440,120L1392,120C1344,120,1248,120,1152,120C1056,120,960,120,864,120C768,120,672,120,576,120C480,120,384,120,288,120C192,120,96,120,48,120L0,120Z"
-                class="fill-white"></path>
+            <path d="M0,64L48,69.3C96,75,192,85,288,80C384,75,480,53,576,48C672,43,768,53,864,64C960,75,1056,85,1152,80C1248,75,1344,53,1392,42.7L1440,32L1440,120L1392,120C1344,120,1248,120,1152,120C1056,120,960,120,864,120C768,120,672,120,576,120C480,120,384,120,288,120C192,120,96,120,48,120L0,120Z" class="fill-white"></path>
         </svg>
     </div>
 </section>
