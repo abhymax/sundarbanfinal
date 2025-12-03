@@ -2,22 +2,22 @@
 require_once 'db_connect.php';
 $pageKey = '2n3d_tour';
 
-// --- FETCH DATA ---
-try { $hero = $pdo->query("SELECT * FROM site_sections WHERE section_key = '{$pageKey}_hero'")->fetch(PDO::FETCH_ASSOC); } catch(E $e) { $hero = []; }
-try { $cards = $pdo->query("SELECT * FROM page_cards WHERE page_key = '$pageKey' AND section_key = 'quick_info' ORDER BY sort_order ASC")->fetchAll(PDO::FETCH_ASSOC); } catch(E $e) { $cards = []; }
-try { $expHeader = $pdo->query("SELECT * FROM site_sections WHERE section_key = '{$pageKey}_exp_header'")->fetch(PDO::FETCH_ASSOC); 
-      $highlights = $pdo->query("SELECT * FROM page_highlights WHERE page_key = '$pageKey' AND section_key = 'experience' ORDER BY sort_order ASC")->fetchAll(PDO::FETCH_ASSOC); } catch(E $e) { $highlights = []; }
-try { $itinHeader = $pdo->query("SELECT * FROM site_sections WHERE section_key = '{$pageKey}_itin_header'")->fetch(PDO::FETCH_ASSOC); 
-      $timeline = $pdo->query("SELECT * FROM page_timeline WHERE page_key = '$pageKey' ORDER BY sort_order ASC")->fetchAll(PDO::FETCH_ASSOC); } catch(E $e) { $timeline = []; }
-try { $foodHeader = $pdo->query("SELECT * FROM site_sections WHERE section_key = '{$pageKey}_food_header'")->fetch(PDO::FETCH_ASSOC); 
-      $foodMenus = $pdo->query("SELECT * FROM page_food_menu WHERE page_key = '$pageKey' ORDER BY sort_order ASC")->fetchAll(PDO::FETCH_ASSOC); } catch(E $e) { $foodMenus = []; }
-try { $priceHeader = $pdo->query("SELECT * FROM site_sections WHERE section_key = '{$pageKey}_price_header'")->fetch(PDO::FETCH_ASSOC); 
-      $pricingPlans = $pdo->query("SELECT * FROM page_pricing WHERE page_key = '$pageKey' ORDER BY sort_order ASC")->fetchAll(PDO::FETCH_ASSOC); } catch(E $e) { $pricingPlans = []; }
+// --- SAFE DATA FETCHING (No Crashes) ---
+try { $hero = $pdo->query("SELECT * FROM site_sections WHERE section_key = '{$pageKey}_hero'")->fetch(PDO::FETCH_ASSOC) ?: []; } catch(Exception $e) { $hero=[]; }
+try { $cards = $pdo->query("SELECT * FROM page_cards WHERE page_key = '$pageKey' AND section_key = 'quick_info' ORDER BY sort_order ASC")->fetchAll(PDO::FETCH_ASSOC) ?: []; } catch(Exception $e) { $cards=[]; }
+try { $expHeader = $pdo->query("SELECT * FROM site_sections WHERE section_key = '{$pageKey}_exp_header'")->fetch(PDO::FETCH_ASSOC) ?: []; } catch(Exception $e) { $expHeader=[]; }
+try { $highlights = $pdo->query("SELECT * FROM page_highlights WHERE page_key = '$pageKey' AND section_key = 'experience' ORDER BY sort_order ASC")->fetchAll(PDO::FETCH_ASSOC) ?: []; } catch(Exception $e) { $highlights=[]; }
+try { $itinHeader = $pdo->query("SELECT * FROM site_sections WHERE section_key = '{$pageKey}_itin_header'")->fetch(PDO::FETCH_ASSOC) ?: []; } catch(Exception $e) { $itinHeader=[]; }
+try { $timeline = $pdo->query("SELECT * FROM page_timeline WHERE page_key = '$pageKey' ORDER BY day_number ASC, sort_order ASC")->fetchAll(PDO::FETCH_ASSOC) ?: []; } catch(Exception $e) { $timeline=[]; }
+try { $foodHeader = $pdo->query("SELECT * FROM site_sections WHERE section_key = '{$pageKey}_food_header'")->fetch(PDO::FETCH_ASSOC) ?: []; } catch(Exception $e) { $foodHeader=[]; }
+try { $foodMenus = $pdo->query("SELECT * FROM page_food_menu WHERE page_key = '$pageKey' ORDER BY sort_order ASC")->fetchAll(PDO::FETCH_ASSOC) ?: []; } catch(Exception $e) { $foodMenus=[]; }
+try { $priceHeader = $pdo->query("SELECT * FROM site_sections WHERE section_key = '{$pageKey}_price_header'")->fetch(PDO::FETCH_ASSOC) ?: []; } catch(Exception $e) { $priceHeader=[]; }
+try { $pricingPlans = $pdo->query("SELECT * FROM page_pricing WHERE page_key = '$pageKey' ORDER BY sort_order ASC")->fetchAll(PDO::FETCH_ASSOC) ?: []; } catch(Exception $e) { $pricingPlans=[]; }
 
-// Group Timeline Events by Day
-$day1_events = array_filter($timeline, function($e) { return $e['day_number'] == 1; });
-$day2_events = array_filter($timeline, function($e) { return $e['day_number'] == 2; });
-$day3_events = array_filter($timeline, function($e) { return $e['day_number'] == 3; });
+// Group Timeline Events
+$day1_events = array_filter($timeline, function($e) { return ($e['day_number'] ?? 1) == 1; });
+$day2_events = array_filter($timeline, function($e) { return ($e['day_number'] ?? 1) == 2; });
+$day3_events = array_filter($timeline, function($e) { return ($e['day_number'] ?? 1) == 3; });
 
 // Helpers
 function getThemeClasses($color) {
@@ -45,15 +45,18 @@ include 'header.php';
 
 <header class="relative h-screen flex items-center justify-center overflow-hidden clip-path-wave mb-12">
     <div class="absolute inset-0 z-0">
-        <img src="<?php echo htmlspecialchars($hero['image_url']); ?>" class="w-full h-full object-cover">
-        <div class="absolute inset-0 bg-black" style="opacity: <?php echo htmlspecialchars($hero['overlay_opacity']); ?>;"></div>
+        <?php if(!empty($hero['image_url'])): ?>
+            <img src="<?php echo htmlspecialchars($hero['image_url']); ?>" class="w-full h-full object-cover">
+        <?php else: ?>
+            <div class="w-full h-full bg-gray-900"></div> <?php endif; ?>
+        <div class="absolute inset-0 bg-black" style="opacity: <?php echo htmlspecialchars($hero['overlay_opacity'] ?? '0.5'); ?>;"></div>
     </div>
     <div class="relative z-10 text-center px-4 max-w-4xl mx-auto mt-16">
         <span class="inline-block py-1 px-3 rounded-full bg-green-700/40 border border-green-500 text-green-100 text-sm font-bold tracking-widest uppercase mb-6 backdrop-blur-sm animate-pulse">The Ultimate Experience</span>
-        <h1 class="text-5xl md:text-7xl text-white font-bold mb-6 hero-text leading-tight drop-shadow-lg"><?php echo htmlspecialchars($hero['title']); ?></h1>
-        <p class="text-xl text-gray-100 mb-10 max-w-2xl mx-auto font-light leading-relaxed drop-shadow-md"><?php echo htmlspecialchars($hero['subtitle']); ?></p>
+        <h1 class="text-5xl md:text-7xl text-white font-bold mb-6 hero-text"><?php echo htmlspecialchars($hero['title'] ?? '2 Nights 3 Days Tour'); ?></h1>
+        <p class="text-xl text-gray-100 mb-10 max-w-2xl mx-auto font-light"><?php echo htmlspecialchars($hero['subtitle'] ?? 'Experience the deep jungle.'); ?></p>
         <div class="flex flex-col sm:flex-row gap-4 justify-center">
-            <a href="<?php echo htmlspecialchars($hero['cta_link']); ?>" class="bg-white text-green-900 px-8 py-4 rounded-full font-bold hover:bg-gray-100 transition transform hover:-translate-y-1 shadow-xl flex items-center justify-center gap-2"><?php echo htmlspecialchars($hero['cta_text']); ?> <span class="material-symbols-outlined">arrow_downward</span></a>
+            <a href="<?php echo htmlspecialchars($hero['cta_link'] ?? '#'); ?>" class="bg-white text-green-900 px-8 py-4 rounded-full font-bold hover:bg-gray-100 transition transform hover:-translate-y-1 shadow-xl flex items-center justify-center gap-2"><?php echo htmlspecialchars($hero['cta_text'] ?? 'View Plan'); ?> <span class="material-symbols-outlined">arrow_downward</span></a>
             <a href="#pricing" class="bg-transparent border-2 border-white text-white px-8 py-4 rounded-full font-bold hover:bg-white/10 transition transform hover:-translate-y-1 flex items-center justify-center gap-2">Get Quote <span class="material-symbols-outlined">currency_rupee</span></a>
         </div>
     </div>
@@ -62,21 +65,21 @@ include 'header.php';
 
 <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-32 relative z-20 mb-20">
     <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <?php foreach ($cards as $card): $colors = getThemeClasses($card['color_theme']); ?>
+        <?php if(!empty($cards)): foreach ($cards as $card): $colors = getThemeClasses($card['color_theme']); ?>
             <div class="bg-white p-6 rounded-xl shadow-xl border-b-4 <?php echo $colors[0]; ?> flex flex-col items-center text-center transform hover:-translate-y-2 transition duration-300">
                 <div class="<?php echo $colors[1]; ?> p-3 rounded-full mb-4"><span class="material-symbols-outlined <?php echo $colors[2]; ?> text-3xl"><?php echo htmlspecialchars($card['icon']); ?></span></div>
                 <h3 class="font-bold text-lg text-gray-800"><?php echo htmlspecialchars($card['title']); ?></h3>
                 <p class="text-sm text-gray-500 mt-1"><?php echo htmlspecialchars($card['subtitle']); ?></p>
             </div>
-        <?php endforeach; ?>
+        <?php endforeach; endif; ?>
     </div>
 </section>
 
 <section id="experience" class="py-16 leaf-pattern">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-16">
-            <h2 class="text-3xl md:text-4xl font-bold text-green-900 mb-4"><?php echo htmlspecialchars($expHeader['title']); ?></h2>
-            <p class="text-lg text-gray-600 max-w-2xl mx-auto"><?php echo htmlspecialchars($expHeader['subtitle']); ?></p>
+            <h2 class="text-3xl md:text-4xl font-bold text-green-900 mb-4"><?php echo htmlspecialchars($expHeader['title'] ?? ''); ?></h2>
+            <p class="text-lg text-gray-600 max-w-2xl mx-auto"><?php echo htmlspecialchars($expHeader['subtitle'] ?? ''); ?></p>
         </div>
         <?php foreach ($highlights as $index => $h): $isEven = ($index % 2 == 0); $bullets = json_decode($h['list_data'], true); ?>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center mb-20 last:mb-0">
@@ -94,7 +97,7 @@ include 'header.php';
                     </h3>
                     <p class="text-gray-600 leading-relaxed"><?php echo htmlspecialchars($h['description']); ?></p>
                     <ul class="space-y-3">
-                        <?php foreach($bullets as $b): ?>
+                        <?php if($bullets) foreach($bullets as $b): ?>
                             <li class="flex items-center text-gray-700"><span class="material-symbols-outlined text-green-500 mr-2">check_circle</span><?php echo htmlspecialchars($b); ?></li>
                         <?php endforeach; ?>
                     </ul>
@@ -107,8 +110,8 @@ include 'header.php';
 <section id="itinerary" class="py-20 bg-white relative overflow-hidden">
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div class="text-center mb-16">
-            <span class="text-green-600 font-bold tracking-widest uppercase text-sm"><?php echo htmlspecialchars($itinHeader['subtitle']); ?></span>
-            <h2 class="text-4xl font-bold text-gray-900 mt-2"><?php echo htmlspecialchars($itinHeader['title']); ?></h2>
+            <span class="text-green-600 font-bold tracking-widest uppercase text-sm"><?php echo htmlspecialchars($itinHeader['subtitle'] ?? ''); ?></span>
+            <h2 class="text-4xl font-bold text-gray-900 mt-2"><?php echo htmlspecialchars($itinHeader['title'] ?? ''); ?></h2>
         </div>
 
         <div class="flex justify-center mb-12 flex-wrap gap-2">
@@ -204,11 +207,11 @@ function renderEvent($event, $index) {
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-12">
             <span class="material-symbols-outlined text-4xl text-orange-500 mb-2">ramen_dining</span>
-            <h2 class="text-4xl font-bold text-gray-900"><?php echo htmlspecialchars($foodHeader['title']); ?></h2>
-            <p class="text-gray-600 mt-2"><?php echo htmlspecialchars($foodHeader['subtitle']); ?></p>
+            <h2 class="text-4xl font-bold text-gray-900"><?php echo htmlspecialchars($foodHeader['title'] ?? ''); ?></h2>
+            <p class="text-gray-600 mt-2"><?php echo htmlspecialchars($foodHeader['subtitle'] ?? ''); ?></p>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-            <?php foreach ($foodMenus as $menu): $items = json_decode($menu['items'], true) ?? []; ?>
+            <?php if(!empty($foodMenus)) foreach ($foodMenus as $menu): $items = json_decode($menu['items'], true) ?? []; ?>
                 <div class="bg-white rounded-xl shadow-md p-6 hover:shadow-xl transition group <?php echo $menu['is_highlighted'] ? 'border-t-4 border-orange-500' : ''; ?>">
                     <h3 class="font-bold text-gray-800 mb-2 border-b pb-2"><?php echo htmlspecialchars($menu['title']); ?></h3>
                     <ul class="text-sm text-gray-600 space-y-1">
@@ -226,11 +229,11 @@ function renderEvent($event, $index) {
     <div class="absolute inset-0 bg-green-900/90 z-0"></div>
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div class="text-center mb-16">
-            <h2 class="text-4xl font-bold text-white mb-4"><?php echo htmlspecialchars($priceHeader['title']); ?></h2>
-            <p class="text-green-100"><?php echo htmlspecialchars($priceHeader['subtitle']); ?></p>
+            <h2 class="text-4xl font-bold text-white mb-4"><?php echo htmlspecialchars($priceHeader['title'] ?? ''); ?></h2>
+            <p class="text-green-100"><?php echo htmlspecialchars($priceHeader['subtitle'] ?? ''); ?></p>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-            <?php foreach ($pricingPlans as $plan): 
+            <?php if(!empty($pricingPlans)) foreach ($pricingPlans as $plan): 
                 $isDark = ($plan['style_mode'] === 'dark');
                 $features = json_decode($plan['features'], true) ?? [];
                 $cardClass = $isDark ? 'bg-gray-900 text-white border border-gray-700' : 'bg-white text-gray-800';
@@ -243,7 +246,7 @@ function renderEvent($event, $index) {
                     <?php endif; ?>
                     <h3 class="text-2xl font-bold mb-2"><?php echo htmlspecialchars($plan['title']); ?></h3>
                     <p class="<?php echo $isDark ? 'text-gray-400' : 'text-gray-500'; ?> text-sm mb-6"><?php echo htmlspecialchars($plan['subtitle']); ?></p>
-                    <div class="text-5xl font-bold <?php echo $priceColor; ?> mb-6">₹<?php echo htmlspecialchars($plan['price']); ?><span class="text-lg text-gray-400 font-normal"><?php echo htmlspecialchars($plan['price_unit']); ?></span></div>
+                    <div class="text-5xl font-bold <?php echo $priceColor; ?> mb-6">₹<?php echo htmlspecialchars($plan['price']); ?></div>
                     <ul class="space-y-3 mb-8">
                         <?php foreach ($features as $f): ?>
                             <li class="flex items-center"><span class="material-symbols-outlined <?php echo $isDark ? 'text-orange-500' : 'text-green-500'; ?> mr-2">check</span> <?php echo htmlspecialchars($f); ?></li>

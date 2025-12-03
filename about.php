@@ -1,15 +1,58 @@
-<?php include 'header.php'; ?>
+<?php 
+require_once 'db_connect.php';
+$pageKey = 'about';
+
+// --- FETCH DATA (Safe Loading) ---
+try { $hero = $pdo->query("SELECT * FROM site_sections WHERE section_key = '{$pageKey}_hero'")->fetch(PDO::FETCH_ASSOC) ?: []; } catch(Exception $e) { $hero=[]; }
+try { $intro = $pdo->query("SELECT * FROM site_sections WHERE section_key = '{$pageKey}_intro'")->fetch(PDO::FETCH_ASSOC) ?: []; } catch(Exception $e) { $intro=[]; }
+try { $stats = $pdo->query("SELECT * FROM page_cards WHERE page_key = '$pageKey' AND section_key = 'stats' ORDER BY sort_order ASC")->fetchAll(PDO::FETCH_ASSOC) ?: []; } catch(Exception $e) { $stats=[]; }
+try { $missionVision = $pdo->query("SELECT * FROM page_highlights WHERE page_key = '$pageKey' AND section_key = 'mission_vision' ORDER BY sort_order ASC")->fetchAll(PDO::FETCH_ASSOC) ?: []; } catch(Exception $e) { $missionVision=[]; }
+
+include 'header.php'; 
+?>
 
 <header class="relative h-[50vh] flex items-center justify-center overflow-hidden">
     <div class="absolute inset-0 z-0">
-        <img src="https://images.unsplash.com/photo-1503213100123-594f8926a0d9?q=80&w=2670&auto=format&fit=crop"
-            class="w-full h-full object-cover opacity-90">
-        <div class="absolute inset-0 bg-gradient-to-r from-green-900/90 to-green-900/40"></div>
+        <?php 
+        $videoUrl = $hero['video_url'] ?? '';
+        $imageUrl = $hero['image_url'] ?? '';
+        
+        if (!empty($videoUrl)): 
+            // 1. YouTube Link Check
+            if (strpos($videoUrl, 'youtube.com') !== false || strpos($videoUrl, 'youtu.be') !== false): 
+                $ytId = preg_replace('/^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/', '$2', $videoUrl);
+        ?>
+            <iframe class="w-full h-full object-cover pointer-events-none" 
+                src="https://www.youtube.com/embed/<?php echo $ytId; ?>?autoplay=1&mute=1&loop=1&playlist=<?php echo $ytId; ?>&controls=0&showinfo=0&rel=0&modestbranding=1" 
+                frameborder="0" allow="autoplay; encrypted-media" allowfullscreen>
+            </iframe>
+        
+        <?php else: 
+            // 2. Uploaded Video File
+            $vidSrc = strpos($videoUrl, 'http') === 0 ? $videoUrl : $videoUrl;
+        ?>
+            <video autoplay muted loop playsinline class="w-full h-full object-cover">
+                <source src="<?php echo htmlspecialchars($vidSrc); ?>" type="video/mp4">
+            </video>
+        <?php endif; ?>
+        
+        <?php elseif (!empty($imageUrl)): 
+            // 3. Image Fallback
+            $imgSrc = strpos($imageUrl, 'http') === 0 ? $imageUrl : $imageUrl;
+        ?>
+            <img src="<?php echo htmlspecialchars($imgSrc); ?>" class="w-full h-full object-cover opacity-90">
+        
+        <?php else: ?>
+            <div class="w-full h-full bg-safari-green"></div>
+        <?php endif; ?>
+        
+        <div class="absolute inset-0 bg-gradient-to-r from-green-900/90 to-green-900/40" style="opacity: <?php echo htmlspecialchars($hero['overlay_opacity'] ?? '0.5'); ?>;"></div>
     </div>
+    
     <div class="relative z-10 text-center text-white px-4">
-        <span class="text-orange-300 font-bold tracking-widest uppercase text-sm">Since 2015</span>
-        <h1 class="text-5xl md:text-6xl font-bold font-serif mt-2 mb-4">Guardians of the Delta</h1>
-        <p class="text-xl font-light max-w-2xl mx-auto">We are locals, conservationists, and storytellers.</p>
+        <span class="text-tiger-orange font-bold tracking-widest uppercase text-sm"><?php echo htmlspecialchars($hero['cta_text'] ?? 'Since 2015'); ?></span>
+        <h1 class="text-5xl md:text-6xl font-bold font-serif mt-2 mb-4"><?php echo htmlspecialchars($hero['title'] ?? 'Guardians of the Delta'); ?></h1>
+        <p class="text-xl font-light max-w-2xl mx-auto"><?php echo htmlspecialchars($hero['subtitle'] ?? ''); ?></p>
     </div>
 </header>
 
@@ -18,68 +61,71 @@
         <div class="flex flex-col md:flex-row gap-16 items-center">
             <div class="md:w-1/2 relative">
                 <div class="absolute top-4 left-4 w-full h-full border-2 border-tiger-orange rounded-2xl -z-10"></div>
-                <img src="https://images.unsplash.com/photo-1596895111956-bf1cf0599ce5?q=80&w=1000&auto=format&fit=crop"
-                    class="rounded-2xl shadow-2xl w-full">
+                <?php if(!empty($intro['image_url'])): ?>
+                    <img src="<?php echo htmlspecialchars($intro['image_url']); ?>" class="rounded-2xl shadow-2xl w-full object-cover h-[400px]">
+                <?php endif; ?>
             </div>
+            
             <div class="md:w-1/2 space-y-6">
-                <h2 class="text-4xl font-serif font-bold text-green-900">Born from the River</h2>
-                <p class="text-gray-600 leading-relaxed">
-                    Sundarban Boat Safari wasn't started in a boardroom. It began on a small wooden boat in Gosaba,
-                    where our founder, <strong>Rahul Mondal</strong>, grew up listening to the tigers roar across the
-                    river.
-                </p>
-                <p class="text-gray-600 leading-relaxed">
-                    We realized that most tourists saw the Sundarbans through glass windows of large cruisers. We wanted
-                    to change that. We wanted to offer an experience that smells of the wet earth, tastes of the local
-                    mustard fish, and feels like an adventure, not just a sightseeing trip.
-                </p>
-                <div class="grid grid-cols-2 gap-4 pt-4">
-                    <div class="bg-white p-4 rounded-lg shadow-md border-l-4 border-tiger-orange">
-                        <span class="text-3xl font-bold text-green-900">10+</span>
-                        <p class="text-sm text-gray-500">Years Experience</p>
-                    </div>
-                    <div class="bg-white p-4 rounded-lg shadow-md border-l-4 border-green-900">
-                        <span class="text-3xl font-bold text-green-900">5k+</span>
-                        <p class="text-sm text-gray-500">Happy Guests</p>
-                    </div>
+                <h2 class="text-4xl font-serif font-bold text-green-900"><?php echo htmlspecialchars($intro['title'] ?? 'Born from the River'); ?></h2>
+                <div class="text-gray-600 leading-relaxed space-y-4 text-lg">
+                    <?php echo nl2br(htmlspecialchars($intro['subtitle'] ?? '')); ?>
                 </div>
+                
+                <?php if(!empty($stats)): ?>
+                    <div class="grid grid-cols-2 gap-4 pt-6">
+                        <?php foreach($stats as $stat): 
+                            $borderColor = ($stat['color_theme'] ?? '') == 'orange' ? 'border-tiger-orange' : 'border-green-900';
+                        ?>
+                            <div class="bg-white p-4 rounded-lg shadow-md border-l-4 <?php echo $borderColor; ?>">
+                                <span class="text-3xl font-bold text-green-900"><?php echo htmlspecialchars($stat['title'] ?? ''); ?></span>
+                                <p class="text-sm text-gray-500"><?php echo htmlspecialchars($stat['subtitle'] ?? ''); ?></p>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+                <?php endif; ?>
             </div>
         </div>
     </div>
 </section>
 
-<section class="py-24 bg-green-50">
-    <div class="max-w-6xl mx-auto px-4 text-center">
-        <h2 class="text-4xl font-serif font-bold text-green-900 mb-16">The People Behind the Oars</h2>
+<section class="py-24 bg-[#fcfcfc] relative overflow-hidden">
+    <div class="absolute top-0 right-0 w-1/2 h-full bg-green-50/50 -skew-x-12 pointer-events-none"></div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div class="bg-white p-8 rounded-2xl shadow-xl hover:-translate-y-2 transition duration-300">
-                <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=1000&auto=format&fit=crop"
-                    class="w-32 h-32 rounded-full mx-auto object-cover border-4 border-tiger-orange mb-6">
-                <h3 class="text-xl font-bold text-gray-800">Rahul Mondal</h3>
-                <p class="text-tiger-orange text-sm uppercase font-bold mb-4">Founder & Lead Naturalist</p>
-                <p class="text-gray-600 text-sm italic">"The forest speaks to those who listen. My job is to teach you
-                    its language."</p>
-            </div>
+    <div class="max-w-7xl mx-auto px-4 relative z-10">
+        <?php if(!empty($missionVision)): foreach ($missionVision as $index => $item): 
+            $isEven = ($index % 2 == 0); // Mission (0) = Image Left, Vision (1) = Image Right
+            $imgSrc = !empty($item['image_url']) ? (strpos($item['image_url'], 'http')===0 ? $item['image_url'] : $item['image_url']) : null;
+        ?>
+            <div class="flex flex-col <?php echo $isEven ? 'md:flex-row' : 'md:flex-row-reverse'; ?> items-center gap-12 mb-24 last:mb-0">
+                
+                <div class="w-full md:w-1/2">
+                    <div class="relative group">
+                        <div class="absolute inset-0 bg-safari-green rounded-2xl transform <?php echo $isEven ? 'rotate-3' : '-rotate-3'; ?> opacity-20 transition-transform group-hover:rotate-0"></div>
+                        <?php if($imgSrc): ?>
+                            <img src="<?php echo htmlspecialchars($imgSrc); ?>" alt="<?php echo htmlspecialchars($item['title'] ?? ''); ?>" 
+                                class="relative w-full h-[400px] object-cover rounded-2xl shadow-xl transform transition duration-500 group-hover:-translate-y-2">
+                        <?php endif; ?>
+                    </div>
+                </div>
 
-            <div class="bg-white p-8 rounded-2xl shadow-xl hover:-translate-y-2 transition duration-300">
-                <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=1000&auto=format&fit=crop"
-                    class="w-32 h-32 rounded-full mx-auto object-cover border-4 border-green-700 mb-6">
-                <h3 class="text-xl font-bold text-gray-800">Amit Das</h3>
-                <p class="text-green-700 text-sm uppercase font-bold mb-4">Senior Boat Captain</p>
-                <p class="text-gray-600 text-sm italic">"I know these tides better than the back of my hand. Your safety
-                    is my promise."</p>
-            </div>
+                <div class="w-full md:w-1/2 space-y-6 text-center <?php echo $isEven ? 'md:text-left' : 'md:text-left'; ?>">
+                    
+                    <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-safari-green border border-tiger-orange text-tiger-orange font-bold uppercase tracking-widest text-xs mb-4 shadow-sm">
+                        <span class="material-symbols-outlined text-sm">
+                            <?php echo $isEven ? 'verified' : 'rocket_launch'; ?>
+                        </span>
+                        <?php echo $isEven ? 'Our Purpose' : 'The Future'; ?>
+                    </div>
 
-            <div class="bg-white p-8 rounded-2xl shadow-xl hover:-translate-y-2 transition duration-300">
-                <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=1000&auto=format&fit=crop"
-                    class="w-32 h-32 rounded-full mx-auto object-cover border-4 border-tiger-orange mb-6">
-                <h3 class="text-xl font-bold text-gray-800">Priya Sen</h3>
-                <p class="text-tiger-orange text-sm uppercase font-bold mb-4">Guest Experience Manager</p>
-                <p class="text-gray-600 text-sm italic">"From your first call to your last meal, I ensure everything is
-                    perfect."</p>
+                    <h2 class="text-4xl md:text-5xl font-serif font-bold text-safari-dark"><?php echo htmlspecialchars($item['title'] ?? ''); ?></h2>
+                    <p class="text-gray-600 text-lg leading-relaxed">
+                        <?php echo nl2br(htmlspecialchars($item['description'] ?? '')); ?>
+                    </p>
+                </div>
+
             </div>
-        </div>
+        <?php endforeach; endif; ?>
     </div>
 </section>
 
