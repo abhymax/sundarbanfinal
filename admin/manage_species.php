@@ -31,15 +31,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $is_featured = isset($_POST['is_featured']) ? 1 : 0;
         $sort_order = (int) $_POST['sort_order'];
         
-        // Default to current image if no new one uploaded
         $image_url = $_POST['current_image_url'] ?? '';
 
-        // Image Upload
         if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
             $uploadDir = '../uploads/';
-            if (!is_dir($uploadDir)) {
-                mkdir($uploadDir, 0755, true);
-            }
+            if (!is_dir($uploadDir)) mkdir($uploadDir, 0755, true);
 
             $ext = strtolower(pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION));
             $allowed = ['jpg', 'jpeg', 'png', 'webp'];
@@ -47,7 +43,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (in_array($ext, $allowed)) {
                 $newFile = 'species_' . time() . '.' . $ext;
                 if (move_uploaded_file($_FILES['image']['tmp_name'], $uploadDir . $newFile)) {
-                    $image_url = 'uploads/' . $newFile; // Store relative path
+                    $image_url = 'uploads/' . $newFile; 
                 } else {
                     throw new Exception("Failed to move uploaded file.");
                 }
@@ -57,12 +53,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         if (isset($_POST['id']) && !empty($_POST['id'])) {
-            // Update
             $stmt = $pdo->prepare("UPDATE species SET name=?, description=?, image_url=?, is_featured_on_home=?, sort_order=? WHERE id=?");
             $stmt->execute([$name, $description, $image_url, $is_featured, $sort_order, $_POST['id']]);
             $message = "Species updated successfully!";
         } else {
-            // Insert
             $stmt = $pdo->prepare("INSERT INTO species (name, description, image_url, is_featured_on_home, sort_order) VALUES (?, ?, ?, ?, ?)");
             $stmt->execute([$name, $description, $image_url, $is_featured, $sort_order]);
             $message = "Species added successfully!";
@@ -76,126 +70,117 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 // Fetch All Species
 $species_list = $pdo->query("SELECT * FROM species ORDER BY sort_order ASC")->fetchAll(PDO::FETCH_ASSOC);
+
+include 'header.php';
 ?>
-<!DOCTYPE html>
-<html lang="en">
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manage Wildlife - Admin</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
-</head>
+<div class="max-w-6xl mx-auto">
+    <div class="mb-8">
+        <h1 class="text-4xl font-bold text-safari-dark font-serif">Wildlife Checklist</h1>
+        <p class="text-gray-500 mt-2">Manage the animals and plants displayed on the website.</p>
+    </div>
 
-<body class="bg-gray-50 font-['Inter']">
-    <div class="min-h-screen flex flex-col">
-        <nav class="bg-white shadow-sm border-b border-gray-200 px-6 py-4 flex justify-between items-center">
-            <h1 class="text-xl font-bold text-gray-800">Manage Wildlife</h1>
-            <a href="dashboard.php" class="text-blue-600 hover:underline flex items-center gap-1">
-                <span class="material-symbols-outlined text-sm">arrow_back</span> Back to Dashboard
-            </a>
-        </nav>
+    <?php if ($message): ?>
+        <div class="p-4 mb-6 rounded-xl border <?php echo $messageType === 'success' ? 'bg-green-100 text-green-700 border-green-400' : 'bg-red-100 text-red-700 border-red-400'; ?> flex items-center gap-2">
+            <span class="material-symbols-outlined"><?php echo $messageType === 'success' ? 'check_circle' : 'error'; ?></span>
+            <?php echo htmlspecialchars($message); ?>
+        </div>
+    <?php endif; ?>
 
-        <div class="flex-1 p-8 max-w-6xl mx-auto w-full">
-            <?php if ($message): ?>
-                <div class="p-4 mb-6 rounded-lg <?php echo $messageType === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'; ?>">
-                    <?php echo htmlspecialchars($message); ?>
-                </div>
-            <?php endif; ?>
-
-            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
-                <h2 class="text-lg font-bold mb-4 text-gray-800">Add / Edit Species</h2>
-                <form method="POST" enctype="multipart/form-data" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div class="lg:col-span-1">
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 sticky top-6">
+                <h2 class="text-xl font-bold text-safari-dark mb-4 flex items-center gap-2">
+                    <span class="material-symbols-outlined text-tiger-yellow">add_circle</span> Add / Edit
+                </h2>
+                
+                <form method="POST" enctype="multipart/form-data" class="space-y-4">
                     <input type="hidden" name="id" id="species_id">
                     <input type="hidden" name="current_image_url" id="current_image_url">
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Name</label>
+                        <label class="block text-sm font-bold text-gray-700 mb-1">Name</label>
                         <input type="text" name="name" id="name" required
-                            class="w-full rounded-lg border-gray-300 border p-2 focus:ring-2 focus:ring-blue-500 outline-none">
+                            class="w-full rounded-lg border-gray-300 border p-2 focus:ring-2 focus:ring-safari-green outline-none transition">
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Sort Order</label>
-                        <input type="number" name="sort_order" id="sort_order" value="0"
-                            class="w-full rounded-lg border-gray-300 border p-2 focus:ring-2 focus:ring-blue-500 outline-none">
-                    </div>
-
-                    <div class="md:col-span-2">
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                        <label class="block text-sm font-bold text-gray-700 mb-1">Description</label>
                         <textarea name="description" id="description" rows="3"
-                            class="w-full rounded-lg border-gray-300 border p-2 focus:ring-2 focus:ring-blue-500 outline-none"></textarea>
+                            class="w-full rounded-lg border-gray-300 border p-2 focus:ring-2 focus:ring-safari-green outline-none transition"></textarea>
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Image</label>
+                        <label class="block text-sm font-bold text-gray-700 mb-1">Sort Order</label>
+                        <input type="number" name="sort_order" id="sort_order" value="0"
+                            class="w-full rounded-lg border-gray-300 border p-2 focus:ring-2 focus:ring-safari-green outline-none transition">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-1">Image</label>
                         <input type="file" name="image" accept="image/*"
-                            class="w-full border border-gray-300 rounded-lg p-2 text-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
-                        <p class="text-xs text-gray-500 mt-1">Leave empty to keep existing image</p>
+                            class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-gray-100 file:text-gray-700 hover:file:bg-gray-200 cursor-pointer">
+                        <p class="text-xs text-gray-400 mt-1">Leave empty to keep existing.</p>
                     </div>
 
-                    <div class="flex items-center">
+                    <div class="flex items-center bg-gray-50 p-3 rounded-lg border border-gray-100">
                         <input type="checkbox" name="is_featured" id="is_featured" value="1"
-                            class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
-                        <label for="is_featured" class="ml-2 text-sm text-gray-700">Show on Homepage</label>
+                            class="w-5 h-5 text-safari-green rounded focus:ring-safari-green border-gray-300">
+                        <label for="is_featured" class="ml-2 text-sm font-medium text-gray-700">Featured on Home</label>
                     </div>
 
-                    <div class="md:col-span-2 flex justify-end gap-3 border-t pt-4">
+                    <div class="flex gap-2 pt-2">
                         <button type="button" onclick="resetForm()"
-                            class="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition">Cancel</button>
-                        <button type="submit" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition shadow-md">Save Species</button>
+                            class="flex-1 px-4 py-2 text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-xl transition font-bold text-sm">Cancel</button>
+                        <button type="submit" class="flex-1 px-4 py-2 bg-safari-green text-white hover:bg-green-800 rounded-xl transition font-bold text-sm shadow-md">Save</button>
                     </div>
                 </form>
             </div>
+        </div>
 
-            <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+        <div class="lg:col-span-2">
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
                 <table class="w-full text-left">
-                    <thead class="bg-gray-50 border-b border-gray-200">
+                    <thead class="bg-gray-50 text-gray-500 text-xs uppercase tracking-wider">
                         <tr>
-                            <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase">Image</th>
-                            <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase">Name</th>
-                            <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase">Featured</th>
-                            <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase">Order</th>
-                            <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase text-right">Actions</th>
+                            <th class="px-6 py-3 font-bold">Image</th>
+                            <th class="px-6 py-3 font-bold">Details</th>
+                            <th class="px-6 py-3 font-bold">Status</th>
+                            <th class="px-6 py-3 font-bold text-right">Actions</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-gray-200">
+                    <tbody class="divide-y divide-gray-100 text-sm">
                         <?php foreach ($species_list as $species): ?>
-                            <tr class="hover:bg-gray-50">
+                            <tr class="hover:bg-gray-50 transition">
                                 <td class="px-6 py-4">
                                     <?php 
                                     $imgSrc = $species['image_url'];
                                     if (!empty($imgSrc)) {
-                                        // FIX: Check if it's an external URL (http/https)
-                                        if (strpos($imgSrc, 'http') === 0) {
-                                            $displaySrc = $imgSrc;
-                                        } else {
-                                            // It's a local file, append ../
-                                            $displaySrc = "../" . $imgSrc;
-                                        }
-                                        echo '<img src="' . htmlspecialchars($displaySrc) . '" class="w-16 h-16 object-cover rounded-lg border border-gray-200 shadow-sm" alt="Species">';
+                                        if (strpos($imgSrc, 'http') !== 0) $imgSrc = "../" . $imgSrc;
+                                        echo '<img src="' . htmlspecialchars($imgSrc) . '" class="w-16 h-16 object-cover rounded-lg border border-gray-200 shadow-sm">';
                                     } else {
                                         echo '<div class="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center text-gray-400"><span class="material-symbols-outlined">image</span></div>';
                                     }
                                     ?>
                                 </td>
-                                <td class="px-6 py-4 font-medium text-gray-900"><?php echo htmlspecialchars($species['name']); ?></td>
+                                <td class="px-6 py-4">
+                                    <div class="font-bold text-gray-900 text-base font-serif"><?php echo htmlspecialchars($species['name']); ?></div>
+                                    <div class="text-xs text-gray-500 mt-1 line-clamp-2"><?php echo htmlspecialchars($species['description']); ?></div>
+                                    <span class="text-xs text-gray-400 mt-1 block">Order: <?php echo $species['sort_order']; ?></span>
+                                </td>
                                 <td class="px-6 py-4">
                                     <?php if ($species['is_featured_on_home']): ?>
-                                        <span class="px-2 py-1 text-xs bg-green-100 text-green-800 rounded-full font-bold">Yes</span>
+                                        <span class="px-2 py-1 text-xs bg-green-100 text-green-800 rounded-full font-bold border border-green-200">Featured</span>
                                     <?php else: ?>
-                                        <span class="px-2 py-1 text-xs bg-gray-100 text-gray-600 rounded-full">No</span>
+                                        <span class="px-2 py-1 text-xs bg-gray-100 text-gray-600 rounded-full border border-gray-200">Hidden</span>
                                     <?php endif; ?>
                                 </td>
-                                <td class="px-6 py-4 text-gray-600"><?php echo $species['sort_order']; ?></td>
-                                <td class="px-6 py-4 text-right space-x-2">
+                                <td class="px-6 py-4 text-right whitespace-nowrap">
                                     <button onclick='editSpecies(<?php echo json_encode($species); ?>)'
-                                        class="text-blue-600 hover:text-blue-800 font-medium transition">Edit</button>
+                                        class="text-blue-600 hover:bg-blue-50 p-2 rounded-lg transition mr-1"><span class="material-symbols-outlined text-sm">edit</span></button>
                                     <a href="?delete=<?php echo $species['id']; ?>"
-                                        onclick="return confirm('Are you sure you want to delete this species?')"
-                                        class="text-red-600 hover:text-red-800 font-medium transition">Delete</a>
+                                        onclick="return confirm('Are you sure?')"
+                                        class="text-red-600 hover:bg-red-50 p-2 rounded-lg transition"><span class="material-symbols-outlined text-sm">delete</span></a>
                                 </td>
                             </tr>
                         <?php endforeach; ?>
@@ -213,8 +198,6 @@ $species_list = $pdo->query("SELECT * FROM species ORDER BY sort_order ASC")->fe
             document.getElementById('sort_order').value = data.sort_order;
             document.getElementById('current_image_url').value = data.image_url;
             document.getElementById('is_featured').checked = data.is_featured_on_home == 1;
-            
-            // Scroll to top
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
@@ -227,5 +210,9 @@ $species_list = $pdo->query("SELECT * FROM species ORDER BY sort_order ASC")->fe
             document.getElementById('is_featured').checked = false;
         }
     </script>
+</div>
+
+</main>
+</div>
 </body>
 </html>

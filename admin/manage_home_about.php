@@ -87,177 +87,164 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 // Fetch Current Data
 $stmt = $pdo->query("SELECT * FROM home_about WHERE id = 1");
 $about = $stmt->fetch(PDO::FETCH_ASSOC);
+
+include 'header.php';
 ?>
-<!DOCTYPE html>
-<html lang="en">
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manage Who We Are | Admin</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
-</head>
-
-<body class="bg-gray-100">
-    <div class="flex min-h-screen">
-        <!-- Sidebar -->
-        <aside class="w-64 bg-gray-900 text-white min-h-screen hidden md:block">
-            <div class="p-6">
-                <h2 class="text-2xl font-bold text-orange-500">Admin Panel</h2>
-            </div>
-            <nav class="mt-6">
-                <a href="dashboard.php" class="block py-3 px-6 hover:bg-gray-800">Dashboard</a>
-                <a href="manage_packages.php" class="block py-3 px-6 hover:bg-gray-800">Packages</a>
-                <a href="manage_home_about.php" class="block py-3 px-6 bg-gray-800 border-l-4 border-orange-500">Who We
-                    Are</a>
-                <a href="settings.php" class="block py-3 px-6 hover:bg-gray-800">General Settings</a>
-                <a href="manage_menu.php" class="block py-3 px-6 hover:bg-gray-800">Manage Menu</a>
-                <a href="logout.php" class="block py-3 px-6 hover:bg-red-600 mt-10">Logout</a>
-            </nav>
-        </aside>
-
-        <!-- Main Content -->
-        <main class="flex-1 p-8">
-            <div class="flex justify-between items-center mb-8">
-                <h1 class="text-3xl font-bold text-gray-800">Manage "Who We Are" Section</h1>
-                <a href="../index.php" target="_blank" class="text-blue-600 hover:underline">View Site</a>
-            </div>
-
-            <?php if ($success_msg): ?>
-                <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
-                    <?php echo $success_msg; ?>
-                </div>
-            <?php endif; ?>
-
-            <?php if ($error_msg): ?>
-                <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-                    <?php echo $error_msg; ?>
-                </div>
-            <?php endif; ?>
-
-            <div class="bg-white rounded-xl shadow-md p-6">
-                <form method="POST" enctype="multipart/form-data" class="space-y-6">
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <!-- Main Content -->
-                        <div class="space-y-4">
-                            <h3 class="text-lg font-bold text-gray-700 border-b pb-2">Main Content</h3>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Tagline</label>
-                                <input type="text" name="tagline"
-                                    value="<?php echo htmlspecialchars($about['tagline']); ?>"
-                                    class="w-full border rounded px-3 py-2 outline-none focus:ring-2 focus:ring-orange-500">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Title</label>
-                                <input type="text" name="title" value="<?php echo htmlspecialchars($about['title']); ?>"
-                                    class="w-full border rounded px-3 py-2 outline-none focus:ring-2 focus:ring-orange-500">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
-                                <textarea name="description" rows="5"
-                                    class="w-full border rounded px-3 py-2 outline-none focus:ring-2 focus:ring-orange-500"><?php echo htmlspecialchars($about['description']); ?></textarea>
-                            </div>
-
-                            <!-- Image Upload -->
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Section Image</label>
-                                <div class="flex items-center gap-4">
-                                    <div class="w-32 h-20 bg-gray-100 rounded overflow-hidden border">
-                                        <?php if (strpos($about['image_url'], 'http') === 0): ?>
-                                            <img src="<?php echo htmlspecialchars($about['image_url']); ?>"
-                                                class="w-full h-full object-cover">
-                                        <?php else: ?>
-                                            <img src="../<?php echo htmlspecialchars($about['image_url']); ?>"
-                                                class="w-full h-full object-cover">
-                                        <?php endif; ?>
-                                    </div>
-                                    <input type="file" name="image" accept="image/*" class="text-sm text-gray-500">
-                                    <input type="hidden" name="current_image_url"
-                                        value="<?php echo htmlspecialchars($about['image_url']); ?>">
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Features -->
-                        <div class="space-y-4">
-                            <h3 class="text-lg font-bold text-gray-700 border-b pb-2">Features</h3>
-
-                            <!-- Feature 1 -->
-                            <div class="bg-gray-50 p-4 rounded-lg">
-                                <h4 class="font-bold text-sm text-gray-600 mb-2">Feature 1</h4>
-                                <div class="grid grid-cols-3 gap-2">
-                                    <div class="col-span-1">
-                                        <label class="block text-xs text-gray-500">Icon (Material Symbol)</label>
-                                        <input type="text" name="feature_1_icon"
-                                            value="<?php echo htmlspecialchars($about['feature_1_icon']); ?>"
-                                            class="w-full border rounded px-2 py-1 text-sm">
-                                    </div>
-                                    <div class="col-span-2">
-                                        <label class="block text-xs text-gray-500">Text</label>
-                                        <input type="text" name="feature_1_text"
-                                            value="<?php echo htmlspecialchars($about['feature_1_text']); ?>"
-                                            class="w-full border rounded px-2 py-1 text-sm">
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Feature 2 -->
-                            <div class="bg-gray-50 p-4 rounded-lg">
-                                <h4 class="font-bold text-sm text-gray-600 mb-2">Feature 2</h4>
-                                <div class="grid grid-cols-3 gap-2">
-                                    <div class="col-span-1">
-                                        <label class="block text-xs text-gray-500">Icon (Material Symbol)</label>
-                                        <input type="text" name="feature_2_icon"
-                                            value="<?php echo htmlspecialchars($about['feature_2_icon']); ?>"
-                                            class="w-full border rounded px-2 py-1 text-sm">
-                                    </div>
-                                    <div class="col-span-2">
-                                        <label class="block text-xs text-gray-500">Text</label>
-                                        <input type="text" name="feature_2_text"
-                                            value="<?php echo htmlspecialchars($about['feature_2_text']); ?>"
-                                            class="w-full border rounded px-2 py-1 text-sm">
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Feature 3 -->
-                            <div class="bg-gray-50 p-4 rounded-lg">
-                                <h4 class="font-bold text-sm text-gray-600 mb-2">Feature 3</h4>
-                                <div class="grid grid-cols-3 gap-2">
-                                    <div class="col-span-1">
-                                        <label class="block text-xs text-gray-500">Icon (Material Symbol)</label>
-                                        <input type="text" name="feature_3_icon"
-                                            value="<?php echo htmlspecialchars($about['feature_3_icon']); ?>"
-                                            class="w-full border rounded px-2 py-1 text-sm">
-                                    </div>
-                                    <div class="col-span-2">
-                                        <label class="block text-xs text-gray-500">Text</label>
-                                        <input type="text" name="feature_3_text"
-                                            value="<?php echo htmlspecialchars($about['feature_3_text']); ?>"
-                                            class="w-full border rounded px-2 py-1 text-sm">
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="text-xs text-gray-500">
-                                Tip: Find icons at <a href="https://fonts.google.com/icons" target="_blank"
-                                    class="text-blue-500 hover:underline">Google Fonts Icons</a>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="flex justify-end pt-4">
-                        <button type="submit"
-                            class="bg-orange-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-orange-700 transition shadow-lg">
-                            Save Content
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </main>
+<div class="max-w-5xl mx-auto">
+    <div class="flex justify-between items-end mb-8">
+        <div>
+            <h1 class="text-4xl font-bold text-safari-dark font-serif">Who We Are</h1>
+            <p class="text-gray-500 mt-2">Manage the main introduction section of the homepage.</p>
+        </div>
+        <a href="../index.php#about" target="_blank" class="text-safari-green font-bold hover:underline flex items-center gap-1">
+            View on Site <span class="material-symbols-outlined text-sm">open_in_new</span>
+        </a>
     </div>
-</body>
 
+    <?php if ($success_msg): ?>
+        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-xl mb-6 flex items-center gap-2">
+            <span class="material-symbols-outlined">check_circle</span> <?php echo $success_msg; ?>
+        </div>
+    <?php endif; ?>
+
+    <?php if ($error_msg): ?>
+        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-xl mb-6 flex items-center gap-2">
+            <span class="material-symbols-outlined">error</span> <?php echo $error_msg; ?>
+        </div>
+    <?php endif; ?>
+
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+        <form method="POST" enctype="multipart/form-data" class="p-8 space-y-8">
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
+                <div class="space-y-6">
+                    <h3 class="text-xl font-bold text-safari-dark border-b border-gray-100 pb-2">Main Content</h3>
+                    
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-2">Tagline</label>
+                        <input type="text" name="tagline"
+                            value="<?php echo htmlspecialchars($about['tagline']); ?>"
+                            class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-safari-green outline-none transition">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-2">Title</label>
+                        <input type="text" name="title" value="<?php echo htmlspecialchars($about['title']); ?>"
+                            class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-safari-green outline-none transition">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-2">Description</label>
+                        <textarea name="description" rows="6"
+                            class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-safari-green outline-none transition"><?php echo htmlspecialchars($about['description']); ?></textarea>
+                    </div>
+
+                    <div class="bg-gray-50 p-4 rounded-xl border border-dashed border-gray-300">
+                        <label class="block text-sm font-bold text-gray-700 mb-3">Section Image</label>
+                        <div class="flex items-center gap-4">
+                            <div class="w-32 h-20 bg-gray-200 rounded-lg overflow-hidden border border-gray-300 shadow-sm">
+                                <?php if (strpos($about['image_url'], 'http') === 0): ?>
+                                    <img src="<?php echo htmlspecialchars($about['image_url']); ?>" class="w-full h-full object-cover">
+                                <?php else: ?>
+                                    <img src="../<?php echo htmlspecialchars($about['image_url']); ?>" class="w-full h-full object-cover">
+                                <?php endif; ?>
+                            </div>
+                            <div class="flex-1">
+                                <input type="file" name="image" accept="image/*" class="text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-white file:text-safari-green file:shadow-sm hover:file:bg-gray-50 cursor-pointer w-full">
+                                <input type="hidden" name="current_image_url" value="<?php echo htmlspecialchars($about['image_url']); ?>">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="space-y-6">
+                    <h3 class="text-xl font-bold text-safari-dark border-b border-gray-100 pb-2">Features</h3>
+
+                    <div class="bg-gray-50 p-5 rounded-xl border border-gray-200">
+                        <h4 class="font-bold text-sm text-gray-500 uppercase tracking-wider mb-3">Feature 1</h4>
+                        <div class="grid grid-cols-3 gap-4">
+                            <div class="col-span-1">
+                                <label class="block text-xs font-bold text-gray-600 mb-1">Icon Code</label>
+                                <input type="text" name="feature_1_icon"
+                                    value="<?php echo htmlspecialchars($about['feature_1_icon']); ?>"
+                                    class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-safari-green outline-none">
+                            </div>
+                            <div class="col-span-2">
+                                <label class="block text-xs font-bold text-gray-600 mb-1">Feature Text</label>
+                                <input type="text" name="feature_1_text"
+                                    value="<?php echo htmlspecialchars($about['feature_1_text']); ?>"
+                                    class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-safari-green outline-none">
+                            </div>
+                        </div>
+                        <div class="mt-2 flex items-center gap-2 text-safari-green">
+                            <span class="material-symbols-outlined"><?php echo htmlspecialchars($about['feature_1_icon']); ?></span>
+                            <span class="text-xs text-gray-400">Preview</span>
+                        </div>
+                    </div>
+
+                    <div class="bg-gray-50 p-5 rounded-xl border border-gray-200">
+                        <h4 class="font-bold text-sm text-gray-500 uppercase tracking-wider mb-3">Feature 2</h4>
+                        <div class="grid grid-cols-3 gap-4">
+                            <div class="col-span-1">
+                                <label class="block text-xs font-bold text-gray-600 mb-1">Icon Code</label>
+                                <input type="text" name="feature_2_icon"
+                                    value="<?php echo htmlspecialchars($about['feature_2_icon']); ?>"
+                                    class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-safari-green outline-none">
+                            </div>
+                            <div class="col-span-2">
+                                <label class="block text-xs font-bold text-gray-600 mb-1">Feature Text</label>
+                                <input type="text" name="feature_2_text"
+                                    value="<?php echo htmlspecialchars($about['feature_2_text']); ?>"
+                                    class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-safari-green outline-none">
+                            </div>
+                        </div>
+                        <div class="mt-2 flex items-center gap-2 text-safari-green">
+                            <span class="material-symbols-outlined"><?php echo htmlspecialchars($about['feature_2_icon']); ?></span>
+                            <span class="text-xs text-gray-400">Preview</span>
+                        </div>
+                    </div>
+
+                    <div class="bg-gray-50 p-5 rounded-xl border border-gray-200">
+                        <h4 class="font-bold text-sm text-gray-500 uppercase tracking-wider mb-3">Feature 3</h4>
+                        <div class="grid grid-cols-3 gap-4">
+                            <div class="col-span-1">
+                                <label class="block text-xs font-bold text-gray-600 mb-1">Icon Code</label>
+                                <input type="text" name="feature_3_icon"
+                                    value="<?php echo htmlspecialchars($about['feature_3_icon']); ?>"
+                                    class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-safari-green outline-none">
+                            </div>
+                            <div class="col-span-2">
+                                <label class="block text-xs font-bold text-gray-600 mb-1">Feature Text</label>
+                                <input type="text" name="feature_3_text"
+                                    value="<?php echo htmlspecialchars($about['feature_3_text']); ?>"
+                                    class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-safari-green outline-none">
+                            </div>
+                        </div>
+                        <div class="mt-2 flex items-center gap-2 text-safari-green">
+                            <span class="material-symbols-outlined"><?php echo htmlspecialchars($about['feature_3_icon']); ?></span>
+                            <span class="text-xs text-gray-400">Preview</span>
+                        </div>
+                    </div>
+
+                    <div class="text-xs text-gray-500 bg-blue-50 p-3 rounded-lg flex items-center gap-2">
+                        <span class="material-symbols-outlined text-blue-500 text-sm">info</span>
+                        Find icons at <a href="https://fonts.google.com/icons" target="_blank" class="text-blue-600 hover:underline font-bold">Google Fonts Icons</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pt-6 border-t border-gray-100 flex justify-end">
+                <button type="submit"
+                    class="bg-safari-green hover:bg-green-800 text-white font-bold py-4 px-10 rounded-xl shadow-lg transition flex items-center gap-2">
+                    <span class="material-symbols-outlined">save</span> Save Changes
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+</main>
+</div>
+</body>
 </html>

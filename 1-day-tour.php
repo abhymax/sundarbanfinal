@@ -1,10 +1,31 @@
-<?php include 'header.php'; ?>
+<?php 
+require_once 'db_connect.php';
+
+// Fetch Dynamic Hero Data
+try {
+    $stmt = $pdo->prepare("SELECT * FROM site_sections WHERE section_key = '1_day_hero'");
+    $stmt->execute();
+    $hero = $stmt->fetch(PDO::FETCH_ASSOC);
+} catch (Exception $e) {
+    // Fallback defaults in case database is empty or error occurs
+    $hero = [
+        'title' => 'Into the Wild Delta',
+        'subtitle' => 'Escape the city chaos. Experience the mystic mangroves in a single day.',
+        'cta_text' => 'View Itinerary',
+        'cta_link' => '#itinerary',
+        'image_url' => 'https://images.unsplash.com/photo-1615656783693-793dbd239c04?q=80&w=2670&auto=format&fit=crop',
+        'overlay_opacity' => 0.5
+    ];
+}
+
+include 'header.php'; 
+?>
 
 <header class="relative h-screen flex items-center justify-center overflow-hidden clip-path-wave mb-12">
     <div class="absolute inset-0 z-0">
-        <img src="https://images.unsplash.com/photo-1615656783693-793dbd239c04?q=80&w=2670&auto=format&fit=crop"
+        <img src="<?php echo htmlspecialchars($hero['image_url']); ?>"
             alt="Sundarban Sunrise" class="w-full h-full object-cover">
-        <div class="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/60"></div>
+        <div class="absolute inset-0 bg-black" style="opacity: <?php echo htmlspecialchars($hero['overlay_opacity']); ?>;"></div>
     </div>
 
     <div class="relative z-10 text-center px-4 max-w-4xl mx-auto mt-16">
@@ -13,17 +34,15 @@
             1 Day Premium Adventure
         </span>
         <h1 class="text-5xl md:text-7xl text-white font-bold mb-6 hero-text leading-tight drop-shadow-lg">
-            Into the Wild <br><span
-                class="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-yellow-300">Delta</span>
+            <?php echo htmlspecialchars($hero['title']); ?>
         </h1>
         <p class="text-xl text-gray-100 mb-10 max-w-2xl mx-auto font-light leading-relaxed drop-shadow-md">
-            Escape the city chaos. Experience the mystic mangroves, spot the Royal Bengal Tiger, and savor authentic
-            local cuisine—all in a single, unforgettable day.
+            <?php echo htmlspecialchars($hero['subtitle']); ?>
         </p>
         <div class="flex flex-col sm:flex-row gap-4 justify-center">
-            <a href="#itinerary"
+            <a href="<?php echo htmlspecialchars($hero['cta_link']); ?>"
                 class="bg-white text-green-900 px-8 py-4 rounded-full font-bold hover:bg-gray-100 transition transform hover:-translate-y-1 shadow-xl flex items-center justify-center gap-2">
-                View Itinerary <span class="material-symbols-outlined">arrow_downward</span>
+                <?php echo htmlspecialchars($hero['cta_text']); ?> <span class="material-symbols-outlined">arrow_downward</span>
             </a>
             <a href="#map-section"
                 class="bg-transparent border-2 border-white text-white px-8 py-4 rounded-full font-bold hover:bg-white/10 transition transform hover:-translate-y-1 flex items-center justify-center gap-2">
@@ -37,250 +56,231 @@
     </div>
 </header>
 
+<?php
+// Fetch Quick Info Cards
+try {
+    $stmt = $pdo->prepare("SELECT * FROM page_cards WHERE page_key = '1_day_tour' AND section_key = 'quick_info' ORDER BY sort_order ASC");
+    $stmt->execute();
+    $cards = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} catch (Exception $e) {
+    $cards = []; // Fallback handled below
+}
+
+// Helper for Color Themes
+function getThemeClasses($color) {
+    switch ($color) {
+        case 'orange': return ['border-orange-500', 'bg-orange-100', 'text-orange-600'];
+        case 'green':  return ['border-green-600',  'bg-green-100',  'text-green-600'];
+        case 'blue':   return ['border-blue-500',   'bg-blue-100',   'text-blue-600'];
+        case 'purple': return ['border-purple-500', 'bg-purple-100', 'text-purple-600'];
+        default:       return ['border-gray-500',   'bg-gray-100',   'text-gray-600'];
+    }
+}
+?>
+
 <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-32 relative z-20 mb-20">
     <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div
-            class="bg-white p-6 rounded-xl shadow-xl border-b-4 border-orange-500 flex flex-col items-center text-center transform hover:-translate-y-2 transition duration-300">
-            <div class="bg-orange-100 p-3 rounded-full mb-4">
-                <span class="material-symbols-outlined text-orange-600 text-3xl">schedule</span>
+        <?php if (!empty($cards)): ?>
+            <?php foreach ($cards as $card): 
+                $colors = getThemeClasses($card['color_theme']);
+            ?>
+                <div class="bg-white p-6 rounded-xl shadow-xl border-b-4 <?php echo $colors[0]; ?> flex flex-col items-center text-center transform hover:-translate-y-2 transition duration-300">
+                    <div class="<?php echo $colors[1]; ?> p-3 rounded-full mb-4">
+                        <span class="material-symbols-outlined <?php echo $colors[2]; ?> text-3xl"><?php echo htmlspecialchars($card['icon']); ?></span>
+                    </div>
+                    <h3 class="font-bold text-lg text-gray-800"><?php echo htmlspecialchars($card['title']); ?></h3>
+                    <p class="text-sm text-gray-500 mt-1"><?php echo htmlspecialchars($card['subtitle']); ?></p>
+                </div>
+            <?php endforeach; ?>
+        <?php else: ?>
+            <div class="col-span-4 text-center bg-white p-6 rounded-xl shadow-lg">
+                <p class="text-gray-500">Quick info not available.</p>
             </div>
-            <h3 class="font-bold text-lg text-gray-800">Full Day Trip</h3>
-            <p class="text-sm text-gray-500 mt-1">5 AM - 9 PM</p>
-        </div>
-        <div
-            class="bg-white p-6 rounded-xl shadow-xl border-b-4 border-green-600 flex flex-col items-center text-center transform hover:-translate-y-2 transition duration-300">
-            <div class="bg-green-100 p-3 rounded-full mb-4">
-                <span class="material-symbols-outlined text-green-600 text-3xl">directions_boat</span>
-            </div>
-            <h3 class="font-bold text-lg text-gray-800">Private/Group Boat</h3>
-            <p class="text-sm text-gray-500 mt-1">6-Cylinder Safety Boat</p>
-        </div>
-        <div
-            class="bg-white p-6 rounded-xl shadow-xl border-b-4 border-blue-500 flex flex-col items-center text-center transform hover:-translate-y-2 transition duration-300">
-            <div class="bg-blue-100 p-3 rounded-full mb-4">
-                <span class="material-symbols-outlined text-blue-600 text-3xl">restaurant_menu</span>
-            </div>
-            <h3 class="font-bold text-lg text-gray-800">All Meals Included</h3>
-            <p class="text-sm text-gray-500 mt-1">Breakfast, Lunch, Snacks</p>
-        </div>
-        <div
-            class="bg-white p-6 rounded-xl shadow-xl border-b-4 border-purple-500 flex flex-col items-center text-center transform hover:-translate-y-2 transition duration-300">
-            <div class="bg-purple-100 p-3 rounded-full mb-4">
-                <span class="material-symbols-outlined text-purple-600 text-3xl">explore</span>
-            </div>
-            <h3 class="font-bold text-lg text-gray-800">Expert Guided</h3>
-            <p class="text-sm text-gray-500 mt-1">Govt. Certified Guide</p>
-        </div>
+        <?php endif; ?>
     </div>
 </section>
+
+<?php
+// Fetch Experience Header
+try {
+    $stmt = $pdo->prepare("SELECT * FROM site_sections WHERE section_key = '1_day_exp_header'");
+    $stmt->execute();
+    $expHeader = $stmt->fetch(PDO::FETCH_ASSOC);
+} catch (Exception $e) { $expHeader = ['title'=>'Why Choose?', 'subtitle'=>'Experience the wild.']; }
+
+// Fetch Highlights
+try {
+    $stmt = $pdo->prepare("SELECT * FROM page_highlights WHERE page_key = '1_day_tour' AND section_key = 'experience' ORDER BY sort_order ASC");
+    $stmt->execute();
+    $highlights = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} catch (Exception $e) { $highlights = []; }
+?>
 
 <section id="experience" class="py-16 leaf-pattern">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-16">
-            <h2 class="text-3xl md:text-4xl font-bold text-green-900 mb-4">Why Choose This 1-Day Escape?</h2>
-            <p class="text-lg text-gray-600 max-w-2xl mx-auto">Unlike standard tours, we maximize your time in the core
-                jungle area. Experience the raw beauty of the delta without the hassle of overnight packing.</p>
+            <h2 class="text-3xl md:text-4xl font-bold text-green-900 mb-4"><?php echo htmlspecialchars($expHeader['title']); ?></h2>
+            <p class="text-lg text-gray-600 max-w-2xl mx-auto"><?php echo htmlspecialchars($expHeader['subtitle']); ?></p>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center mb-20">
-            <div class="order-2 md:order-1 relative group">
-                <div
-                    class="absolute -inset-2 bg-gradient-to-r from-green-600 to-teal-600 rounded-2xl blur opacity-25 group-hover:opacity-75 transition duration-1000 group-hover:duration-200">
+        <?php 
+        foreach ($highlights as $index => $h): 
+            $isEven = ($index % 2 == 0);
+            $bullets = json_decode($h['list_data'], true);
+            $imgSrc = strpos($h['image_url'], 'http') === 0 ? $h['image_url'] : htmlspecialchars($h['image_url']);
+        ?>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center mb-20 last:mb-0">
+                <div class="<?php echo $isEven ? 'order-2 md:order-1' : 'order-1 md:order-2'; ?> relative group">
+                    <div class="absolute -inset-2 bg-gradient-to-r <?php echo $isEven ? 'from-green-600 to-teal-600' : 'from-blue-600 to-cyan-600'; ?> rounded-2xl blur opacity-25 group-hover:opacity-75 transition duration-1000 group-hover:duration-200"></div>
+                    <img src="<?php echo $imgSrc; ?>" alt="<?php echo htmlspecialchars($h['title']); ?>"
+                        class="relative rounded-2xl shadow-2xl w-full object-cover h-96 transform transition duration-500 hover:scale-[1.01]">
+                    
+                    <?php if (!empty($h['badge_text'])): ?>
+                        <div class="absolute bottom-4 right-4 bg-black/70 text-white px-3 py-1 rounded text-xs backdrop-blur-md">
+                            <?php echo htmlspecialchars($h['badge_text']); ?>
+                        </div>
+                    <?php endif; ?>
                 </div>
-                <img src="https://images.unsplash.com/photo-1547971718-d71680108933?q=80&w=1000&auto=format&fit=crop"
-                    alt="Royal Bengal Tiger"
-                    class="relative rounded-2xl shadow-2xl w-full object-cover h-96 transform transition duration-500 hover:scale-[1.01]">
-                <div
-                    class="absolute bottom-4 right-4 bg-black/70 text-white px-3 py-1 rounded text-xs backdrop-blur-md">
-                    Possibility: 20% Sighting Chance
-                </div>
-            </div>
-            <div class="order-1 md:order-2 space-y-6">
-                <h3 class="text-2xl font-bold text-gray-800 flex items-center gap-3">
-                    <span
-                        class="bg-orange-100 text-orange-600 p-2 rounded-lg material-symbols-outlined">visibility</span>
-                    Wildlife Encounters
-                </h3>
-                <p class="text-gray-600 leading-relaxed">
-                    Navigate through the narrow creeks of <strong>Pirkhali</strong> and <strong>Gazikhali</strong>.
-                    These silent channels are the best spots to sight the elusive Royal Bengal Tiger, Estuarine
-                    Crocodiles, and Spotted Deer drinking at the river banks.
-                </p>
-                <ul class="space-y-3">
-                    <li class="flex items-center text-gray-700">
-                        <span class="material-symbols-outlined text-green-500 mr-2">check_circle</span>
-                        Estuarine Crocodiles & Water Monitors
-                    </li>
-                    <li class="flex items-center text-gray-700">
-                        <span class="material-symbols-outlined text-green-500 mr-2">check_circle</span>
-                        Spotted Deer & Wild Boars
-                    </li>
-                    <li class="flex items-center text-gray-700">
-                        <span class="material-symbols-outlined text-green-500 mr-2">check_circle</span>
-                        Rare Kingfishers & Migratory Birds
-                    </li>
-                </ul>
-            </div>
-        </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-            <div class="space-y-6">
-                <h3 class="text-2xl font-bold text-gray-800 flex items-center gap-3">
-                    <span class="bg-blue-100 text-blue-600 p-2 rounded-lg material-symbols-outlined">deck</span>
-                    Premium Boat Safari
-                </h3>
-                <p class="text-gray-600 leading-relaxed">
-                    Your comfort is our priority. Our boats are not just transport; they are floating lounges. Equipped
-                    with clean western toilets, open decks for 360° views, and a dedicated kitchen crew cooking fresh
-                    meals on board.
-                </p>
-                <div class="grid grid-cols-2 gap-4 mt-4">
-                    <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-100">
-                        <span class="material-symbols-outlined text-blue-500 mb-2">wc</span>
-                        <p class="font-bold text-sm">Hygienic Washrooms</p>
-                    </div>
-                    <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-100">
-                        <span class="material-symbols-outlined text-blue-500 mb-2">bed</span>
-                        <p class="font-bold text-sm">Rest Area for Elderly</p>
-                    </div>
+                <div class="<?php echo $isEven ? 'order-1 md:order-2' : 'order-1'; ?> space-y-6">
+                    <h3 class="text-2xl font-bold text-gray-800 flex items-center gap-3">
+                        <span class="<?php echo $isEven ? 'bg-orange-100 text-orange-600' : 'bg-blue-100 text-blue-600'; ?> p-2 rounded-lg material-symbols-outlined">
+                            <?php echo $isEven ? 'visibility' : 'deck'; ?>
+                        </span>
+                        <?php echo htmlspecialchars($h['title']); ?>
+                    </h3>
+                    <p class="text-gray-600 leading-relaxed"><?php echo htmlspecialchars($h['description']); ?></p>
+                    
+                    <?php if (!empty($bullets)): ?>
+                        <?php if ($isEven): // List Style for Wildlife ?>
+                            <ul class="space-y-3">
+                                <?php foreach($bullets as $b): ?>
+                                    <li class="flex items-center text-gray-700">
+                                        <span class="material-symbols-outlined text-green-500 mr-2">check_circle</span>
+                                        <?php echo htmlspecialchars($b); ?>
+                                    </li>
+                                <?php endforeach; ?>
+                            </ul>
+                        <?php else: // Grid Style for Boat ?>
+                            <div class="grid grid-cols-2 gap-4 mt-4">
+                                <?php foreach($bullets as $b): ?>
+                                    <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-100">
+                                        <span class="material-symbols-outlined text-blue-500 mb-2">star</span>
+                                        <p class="font-bold text-sm"><?php echo htmlspecialchars($b); ?></p>
+                                    </div>
+                                <?php endforeach; ?>
+                            </div>
+                        <?php endif; ?>
+                    <?php endif; ?>
                 </div>
             </div>
-            <div class="relative group">
-                <div
-                    class="absolute -inset-2 bg-gradient-to-r from-blue-600 to-cyan-600 rounded-2xl blur opacity-25 group-hover:opacity-75 transition duration-1000 group-hover:duration-200">
-                </div>
-                <img src="https://images.unsplash.com/photo-1544636331-e26879cd4d9b?q=80&w=2574&auto=format&fit=crop"
-                    alt="Premium Boat Safari"
-                    class="relative rounded-2xl shadow-2xl w-full object-cover h-96 transform transition duration-500 hover:scale-[1.01]">
-            </div>
-        </div>
+        <?php endforeach; ?>
     </div>
 </section>
+
+<?php
+// Fetch Itinerary Header
+try {
+    $stmt = $pdo->prepare("SELECT * FROM site_sections WHERE section_key = '1_day_itin_header'");
+    $stmt->execute();
+    $itinHeader = $stmt->fetch(PDO::FETCH_ASSOC);
+} catch (Exception $e) { $itinHeader = ['title'=>'Your Day', 'subtitle'=>'Hour by Hour']; }
+
+// Fetch Timeline Events
+try {
+    $stmt = $pdo->prepare("SELECT * FROM page_timeline WHERE page_key = '1_day_tour' ORDER BY sort_order ASC");
+    $stmt->execute();
+    $timeline = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} catch (Exception $e) { $timeline = []; }
+
+// Helper for Colors
+function getItinColorClasses($color) {
+    switch ($color) {
+        case 'orange': return ['border-orange-500', 'text-orange-600', 'bg-orange-500', 'bg-orange-100'];
+        case 'green':  return ['border-green-600',  'text-green-600',  'bg-green-600',  'bg-green-100'];
+        case 'blue':   return ['border-blue-600',   'text-blue-600',   'bg-blue-600',   'bg-blue-100'];
+        case 'yellow': return ['border-yellow-500', 'text-yellow-600', 'bg-yellow-500', 'bg-yellow-100'];
+        case 'gray':   return ['border-gray-600',   'text-gray-600',   'bg-gray-700',   'bg-gray-100'];
+        default:       return ['border-gray-500',   'text-gray-600',   'bg-gray-500',   'bg-gray-100'];
+    }
+}
+?>
 
 <section id="itinerary" class="py-20 bg-white relative overflow-hidden">
     <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div class="text-center mb-16">
-            <span class="text-green-600 font-bold tracking-widest uppercase text-sm">Hour by Hour</span>
-            <h2 class="text-4xl font-bold text-gray-900 mt-2">Your Day in the Delta</h2>
+            <span class="text-green-600 font-bold tracking-widest uppercase text-sm"><?php echo htmlspecialchars($itinHeader['subtitle']); ?></span>
+            <h2 class="text-4xl font-bold text-gray-900 mt-2"><?php echo htmlspecialchars($itinHeader['title']); ?></h2>
         </div>
 
         <div class="relative">
-            <div class="timeline-line"></div>
+            <div class="absolute left-4 md:left-1/2 top-0 bottom-0 w-1 bg-gray-200 transform md:-translate-x-1/2"></div>
 
-            <div class="relative z-10 flex flex-col md:flex-row gap-8 mb-16 items-center timeline-item">
-                <div class="w-full md:w-1/2 flex justify-end md:pr-8 text-right">
-                    <div
-                        class="bg-gray-50 p-6 rounded-xl shadow-md border-l-4 border-orange-500 w-full md:w-4/5 transform hover:-translate-x-2 transition">
-                        <div class="text-2xl font-bold text-orange-600 mb-1 font-heading">5:00 AM - 6:00 AM</div>
-                        <h4 class="text-xl font-bold text-gray-800 mb-2">The Journey Begins</h4>
-                        <p class="text-gray-600 text-sm">Pickup from designated points in Kolkata (Esplanade / Science
-                            City). Enjoy a smooth drive through the Bengal countryside.</p>
-                        <div
-                            class="mt-3 inline-flex items-center text-xs font-bold text-orange-600 bg-orange-100 px-2 py-1 rounded">
-                            <span class="material-symbols-outlined text-sm mr-1">local_taxi</span> AC Transfer
-                        </div>
+            <?php foreach ($timeline as $index => $event): 
+                $isEven = ($index % 2 == 0); // Even index = 0, 2, 4 (Left Side on Desktop)
+                $colors = getItinColorClasses($event['color_theme']); // 0:border, 1:text, 2:bg-icon, 3:bg-tag
+                $imgSrc = !empty($event['image_url']) ? (strpos($event['image_url'], 'http') === 0 ? $event['image_url'] : $event['image_url']) : null;
+                $tags = array_filter(explode(',', $event['tags']));
+            ?>
+                <div class="relative z-10 flex flex-col md:flex-row gap-8 mb-16 items-center">
+                    
+                    <div class="w-full md:w-1/2 flex <?php echo $isEven ? 'justify-end md:pr-8 text-right' : 'justify-end md:pr-8 hidden md:block'; ?>">
+                        <?php if ($isEven): ?>
+                            <div class="bg-gray-50 p-6 rounded-xl shadow-md border-l-4 <?php echo $colors[0]; ?> w-full md:w-4/5 transform hover:-translate-x-2 transition relative ml-12 md:ml-0">
+                                <div class="text-2xl font-bold <?php echo $colors[1]; ?> mb-1 font-heading"><?php echo htmlspecialchars($event['time_range']); ?></div>
+                                <h4 class="text-xl font-bold text-gray-800 mb-2"><?php echo htmlspecialchars($event['title']); ?></h4>
+                                <p class="text-gray-600 text-sm"><?php echo htmlspecialchars($event['description']); ?></p>
+                                
+                                <?php if (!empty($tags)): ?>
+                                    <div class="mt-3 inline-flex flex-wrap gap-2 justify-end">
+                                        <?php foreach($tags as $tag): ?>
+                                            <span class="text-xs font-bold <?php echo $colors[1]; ?> <?php echo $colors[3]; ?> px-2 py-1 rounded">
+                                                <?php echo htmlspecialchars(trim($tag)); ?>
+                                            </span>
+                                        <?php endforeach; ?>
+                                    </div>
+                                <?php endif; ?>
+                            </div>
+                        <?php elseif ($imgSrc): ?>
+                            <img src="<?php echo htmlspecialchars($imgSrc); ?>" class="rounded-xl shadow-lg w-3/4 ml-auto opacity-80 grayscale hover:grayscale-0 transition object-cover h-64">
+                        <?php endif; ?>
                     </div>
-                </div>
-                <div
-                    class="absolute left-1/2 transform -translate-x-1/2 flex items-center justify-center w-12 h-12 rounded-full bg-orange-500 text-white shadow-lg z-20">
-                    <span class="material-symbols-outlined">departure_board</span>
-                </div>
-                <div class="w-full md:w-1/2 md:pl-8 hidden md:block">
-                    <img src="https://images.unsplash.com/photo-1558280417-695022067571?q=80&w=1000&auto=format&fit=crop"
-                        class="rounded-xl shadow-lg w-3/4 opacity-80 grayscale hover:grayscale-0 transition">
-                </div>
-            </div>
 
-            <div class="relative z-10 flex flex-col md:flex-row gap-8 mb-16 items-center timeline-item">
-                <div class="w-full md:w-1/2 md:pr-8 hidden md:block text-right">
-                    <img src="https://images.unsplash.com/photo-1623164962299-0c679b329244?q=80&w=1000&auto=format&fit=crop"
-                        class="rounded-xl shadow-lg w-3/4 ml-auto opacity-80 grayscale hover:grayscale-0 transition">
-                </div>
-                <div
-                    class="absolute left-1/2 transform -translate-x-1/2 flex items-center justify-center w-12 h-12 rounded-full bg-green-600 text-white shadow-lg z-20">
-                    <span class="material-symbols-outlined">coffee</span>
-                </div>
-                <div class="w-full md:w-1/2 flex justify-start md:pl-8">
-                    <div
-                        class="bg-gray-50 p-6 rounded-xl shadow-md border-l-4 border-green-600 w-full md:w-4/5 transform hover:translate-x-2 transition">
-                        <div class="text-2xl font-bold text-green-600 mb-1 font-heading">8:30 AM</div>
-                        <h4 class="text-xl font-bold text-gray-800 mb-2">Arrival at Godkhali</h4>
-                        <p class="text-gray-600 text-sm">Reach the gateway of Sundarbans. Board our motorized safari
-                            boat. Welcome drinks and breakfast served immediately on board.</p>
+                    <div class="absolute left-4 md:left-1/2 transform md:-translate-x-1/2 flex items-center justify-center w-12 h-12 rounded-full <?php echo $colors[2]; ?> text-white shadow-lg z-20 border-4 border-white">
+                        <span class="material-symbols-outlined"><?php echo htmlspecialchars($event['icon']); ?></span>
                     </div>
-                </div>
-            </div>
 
-            <div class="relative z-10 flex flex-col md:flex-row gap-8 mb-16 items-center timeline-item">
-                <div class="w-full md:w-1/2 flex justify-end md:pr-8 text-right">
-                    <div
-                        class="bg-gray-50 p-6 rounded-xl shadow-md border-l-4 border-blue-600 w-full md:w-4/5 transform hover:-translate-x-2 transition">
-                        <div class="text-2xl font-bold text-blue-600 mb-1 font-heading">9:30 AM - 1:00 PM</div>
-                        <h4 class="text-xl font-bold text-gray-800 mb-2">Deep Jungle Safari</h4>
-                        <p class="text-gray-600 text-sm">Cruise through Sajnekhali and Sudhanyakhali Watch Towers. Visit
-                            the Mangrove Interpretation Centre. Navigate narrow creeks for wildlife spotting.</p>
-                        <div class="mt-3 flex gap-2 justify-end flex-wrap">
-                            <span
-                                class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded font-bold">Sajnekhali</span>
-                            <span
-                                class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded font-bold">Sudhanyakhali</span>
-                        </div>
+                    <div class="w-full md:w-1/2 flex <?php echo !$isEven ? 'justify-start md:pl-8 text-left' : 'justify-start md:pl-8 hidden md:block'; ?>">
+                        <?php if (!$isEven): ?>
+                            <div class="bg-gray-50 p-6 rounded-xl shadow-md border-l-4 <?php echo $colors[0]; ?> w-full md:w-4/5 transform hover:translate-x-2 transition relative ml-12 md:ml-0">
+                                <div class="text-2xl font-bold <?php echo $colors[1]; ?> mb-1 font-heading"><?php echo htmlspecialchars($event['time_range']); ?></div>
+                                <h4 class="text-xl font-bold text-gray-800 mb-2"><?php echo htmlspecialchars($event['title']); ?></h4>
+                                <p class="text-gray-600 text-sm"><?php echo htmlspecialchars($event['description']); ?></p>
+                                
+                                <?php if (!empty($tags)): ?>
+                                    <div class="mt-3 inline-flex flex-wrap gap-2">
+                                        <?php foreach($tags as $tag): ?>
+                                            <span class="text-xs font-bold <?php echo $colors[1]; ?> <?php echo $colors[3]; ?> px-2 py-1 rounded">
+                                                <?php echo htmlspecialchars(trim($tag)); ?>
+                                            </span>
+                                        <?php endforeach; ?>
+                                    </div>
+                                <?php endif; ?>
+                            </div>
+                        <?php elseif ($imgSrc): ?>
+                            <img src="<?php echo htmlspecialchars($imgSrc); ?>" class="rounded-xl shadow-lg w-3/4 opacity-80 grayscale hover:grayscale-0 transition object-cover h-64">
+                        <?php endif; ?>
                     </div>
-                </div>
-                <div
-                    class="absolute left-1/2 transform -translate-x-1/2 flex items-center justify-center w-12 h-12 rounded-full bg-blue-600 text-white shadow-lg z-20">
-                    <span class="material-symbols-outlined">pets</span>
-                </div>
-                <div class="w-full md:w-1/2 md:pl-8 hidden md:block">
-                    <img src="https://images.unsplash.com/photo-1604928126569-7977759a2441?q=80&w=1000&auto=format&fit=crop"
-                        class="rounded-xl shadow-lg w-3/4 opacity-80 grayscale hover:grayscale-0 transition">
-                </div>
-            </div>
 
-            <div class="relative z-10 flex flex-col md:flex-row gap-8 mb-16 items-center timeline-item">
-                <div class="w-full md:w-1/2 md:pr-8 hidden md:block text-right">
-                    <img src="https://images.unsplash.com/photo-1596627584260-327c0303e302?q=80&w=1000&auto=format&fit=crop"
-                        class="rounded-xl shadow-lg w-3/4 ml-auto opacity-80 grayscale hover:grayscale-0 transition">
                 </div>
-                <div
-                    class="absolute left-1/2 transform -translate-x-1/2 flex items-center justify-center w-12 h-12 rounded-full bg-yellow-500 text-white shadow-lg z-20">
-                    <span class="material-symbols-outlined">restaurant</span>
-                </div>
-                <div class="w-full md:w-1/2 flex justify-start md:pl-8">
-                    <div
-                        class="bg-gray-50 p-6 rounded-xl shadow-md border-l-4 border-yellow-500 w-full md:w-4/5 transform hover:translate-x-2 transition">
-                        <div class="text-2xl font-bold text-yellow-600 mb-1 font-heading">1:30 PM</div>
-                        <h4 class="text-xl font-bold text-gray-800 mb-2">Lunch on the River</h4>
-                        <p class="text-gray-600 text-sm">Enjoy a freshly cooked, hot Bengali buffet lunch while the boat
-                            anchors in the middle of the river, surrounded by silence and nature.</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="relative z-10 flex flex-col md:flex-row gap-8 mb-8 items-center timeline-item">
-                <div class="w-full md:w-1/2 flex justify-end md:pr-8 text-right">
-                    <div
-                        class="bg-gray-50 p-6 rounded-xl shadow-md border-l-4 border-gray-600 w-full md:w-4/5 transform hover:-translate-x-2 transition">
-                        <div class="text-2xl font-bold text-gray-600 mb-1 font-heading">5:00 PM - 8:30 PM</div>
-                        <h4 class="text-xl font-bold text-gray-800 mb-2">Sunset Return</h4>
-                        <p class="text-gray-600 text-sm">Witness a magical sunset over the delta as we return to
-                            Godkhali. Transfer back to your vehicle and drop-off at Kolkata.</p>
-                    </div>
-                </div>
-                <div
-                    class="absolute left-1/2 transform -translate-x-1/2 flex items-center justify-center w-12 h-12 rounded-full bg-gray-700 text-white shadow-lg z-20">
-                    <span class="material-symbols-outlined">home</span>
-                </div>
-                <div class="w-full md:w-1/2 md:pl-8 hidden md:block">
-                </div>
-            </div>
+            <?php endforeach; ?>
         </div>
     </div>
 </section>
 
 <section id="map-section" class="h-[500px] w-full relative">
     <div id="map" class="w-full h-full bg-gray-200 flex items-center justify-center">
-        <p class="text-gray-500">Loading Map...</p>
+        <p class="text-gray-500 animate-pulse">Loading Google Maps...</p>
     </div>
     <div class="absolute bottom-4 left-4 z-10 bg-white p-4 rounded-lg shadow-lg max-w-xs">
         <h4 class="font-bold text-gray-800 mb-2">Route Map</h4>
@@ -299,131 +299,131 @@
     </div>
 </section>
 
+<?php
+// Fetch Food Header
+try {
+    $stmt = $pdo->prepare("SELECT * FROM site_sections WHERE section_key = '1_day_food_header'");
+    $stmt->execute();
+    $foodHeader = $stmt->fetch(PDO::FETCH_ASSOC);
+} catch (Exception $e) { $foodHeader = ['title'=>'A Taste of Bengal', 'subtitle'=>'Freshly cooked on board.']; }
+
+// Fetch Food Menu
+try {
+    $stmt = $pdo->prepare("SELECT * FROM page_food_menu WHERE page_key = '1_day_tour' ORDER BY sort_order ASC");
+    $stmt->execute();
+    $foodMenus = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} catch (Exception $e) { $foodMenus = []; }
+?>
+
 <section id="food" class="py-20 bg-stone-100">
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-12">
             <span class="material-symbols-outlined text-4xl text-orange-500 mb-2">ramen_dining</span>
-            <h2 class="text-4xl font-bold text-gray-900">A Taste of Bengal</h2>
-            <p class="text-gray-600 mt-2">Freshly cooked on the boat. Hygienic, hot, and delicious.</p>
+            <h2 class="text-4xl font-bold text-gray-900"><?php echo htmlspecialchars($foodHeader['title']); ?></h2>
+            <p class="text-gray-600 mt-2"><?php echo htmlspecialchars($foodHeader['subtitle']); ?></p>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div class="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition duration-300 group">
-                <div class="h-48 overflow-hidden">
-                    <img src="https://images.unsplash.com/photo-1601050690597-df0568f70950?q=80&w=1000&auto=format&fit=crop"
-                        alt="Breakfast"
-                        class="w-full h-full object-cover transform group-hover:scale-110 transition duration-500">
+            <?php foreach ($foodMenus as $menu): 
+                $isHighlight = $menu['is_highlighted'];
+                $items = json_decode($menu['items'], true) ?? [];
+                $imgSrc = strpos($menu['image_url'], 'http') === 0 ? $menu['image_url'] : htmlspecialchars($menu['image_url']);
+            ?>
+                <div class="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition duration-300 group <?php echo $isHighlight ? 'border-t-4 border-orange-500 transform md:-translate-y-2' : ''; ?>">
+                    <div class="h-48 overflow-hidden">
+                        <img src="<?php echo $imgSrc; ?>"
+                            alt="<?php echo htmlspecialchars($menu['title']); ?>"
+                            class="w-full h-full object-cover transform group-hover:scale-110 transition duration-500">
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold text-gray-800 mb-2"><?php echo htmlspecialchars($menu['title']); ?></h3>
+                        <ul class="text-gray-600 space-y-2 text-sm">
+                            <?php foreach ($items as $item): ?>
+                                <li class="border-b border-dashed pb-1 <?php echo $isHighlight && strpos($item, 'Fish')!==false ? 'font-bold text-orange-600' : ''; ?>">
+                                    <?php echo htmlspecialchars($item); ?>
+                                </li>
+                            <?php endforeach; ?>
+                        </ul>
+                    </div>
                 </div>
-                <div class="p-6">
-                    <h3 class="text-xl font-bold text-gray-800 mb-2">Breakfast</h3>
-                    <ul class="text-gray-600 space-y-2 text-sm">
-                        <li class="border-b border-dashed pb-1">Radhaballavi / Kachori</li>
-                        <li class="border-b border-dashed pb-1">Alur Dom (Spicy Potato Curry)</li>
-                        <li class="border-b border-dashed pb-1">Boiled Eggs</li>
-                        <li>Bengali Sweets & Tea/Coffee</li>
-                    </ul>
-                </div>
-            </div>
-
-            <div
-                class="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition duration-300 group border-t-4 border-orange-500">
-                <div class="h-48 overflow-hidden">
-                    <img src="https://images.unsplash.com/photo-1631452180519-c014fe946bc7?q=80&w=1000&auto=format&fit=crop"
-                        alt="Lunch"
-                        class="w-full h-full object-cover transform group-hover:scale-110 transition duration-500">
-                </div>
-                <div class="p-6">
-                    <h3 class="text-xl font-bold text-gray-800 mb-2">Grand Lunch</h3>
-                    <ul class="text-gray-600 space-y-2 text-sm">
-                        <li class="border-b border-dashed pb-1">Basmati Rice & Moong Dal</li>
-                        <li class="border-b border-dashed pb-1">Bhaja (Fried Veggies)</li>
-                        <li class="border-b border-dashed pb-1 font-bold text-orange-600">Bhetki Fish Curry / Prawn
-                            Malaikari</li>
-                        <li>Chicken Curry, Chutney, Papad</li>
-                    </ul>
-                </div>
-            </div>
-
-            <div class="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition duration-300 group">
-                <div class="h-48 overflow-hidden">
-                    <img src="https://images.unsplash.com/photo-1601050690117-94f5f6fa8bd7?q=80&w=1000&auto=format&fit=crop"
-                        alt="Snacks"
-                        class="w-full h-full object-cover transform group-hover:scale-110 transition duration-500">
-                </div>
-                <div class="p-6">
-                    <h3 class="text-xl font-bold text-gray-800 mb-2">Evening Bites</h3>
-                    <ul class="text-gray-600 space-y-2 text-sm">
-                        <li class="border-b border-dashed pb-1">Chicken Pakora (Veg option available)</li>
-                        <li class="border-b border-dashed pb-1">Masala Tea / Coffee</li>
-                        <li>Biscuits</li>
-                    </ul>
-                </div>
-            </div>
+            <?php endforeach; ?>
         </div>
     </div>
 </section>
+
+<?php
+// Fetch Pricing Header
+try {
+    $stmt = $pdo->prepare("SELECT * FROM site_sections WHERE section_key = '1_day_price_header'");
+    $stmt->execute();
+    $priceHeader = $stmt->fetch(PDO::FETCH_ASSOC);
+} catch (Exception $e) { $priceHeader = ['title'=>'Simple Pricing', 'subtitle'=>'No hidden charges.']; }
+
+// Fetch Pricing Plans
+try {
+    $stmt = $pdo->prepare("SELECT * FROM page_pricing WHERE page_key = '1_day_tour' ORDER BY sort_order ASC");
+    $stmt->execute();
+    $pricingPlans = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} catch (Exception $e) { $pricingPlans = []; }
+?>
 
 <section id="pricing" class="py-20 leaf-pattern text-white relative">
     <div class="absolute inset-0 bg-green-900/90 z-0"></div>
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div class="text-center mb-16">
-            <h2 class="text-4xl font-bold text-white mb-4">Simple, Transparent Pricing</h2>
-            <p class="text-green-100">No hidden charges. Book your seat today.</p>
+            <h2 class="text-4xl font-bold text-white mb-4"><?php echo htmlspecialchars($priceHeader['title']); ?></h2>
+            <p class="text-green-100"><?php echo htmlspecialchars($priceHeader['subtitle']); ?></p>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-            <div
-                class="bg-white rounded-2xl p-8 text-gray-800 shadow-2xl transform transition hover:scale-105 relative overflow-hidden">
-                <div class="absolute top-0 right-0 bg-green-600 text-white px-4 py-1 rounded-bl-lg font-bold text-sm">
-                    Most Popular</div>
-                <h3 class="text-2xl font-bold mb-2">Group Departure</h3>
-                <p class="text-gray-500 text-sm mb-6">Join other nature lovers. Perfect for couples and solo travelers.
-                </p>
-                <div class="text-5xl font-bold text-green-700 mb-6">₹2,800<span
-                        class="text-lg text-gray-400 font-normal">/person</span></div>
+            <?php foreach ($pricingPlans as $plan): 
+                $isDark = ($plan['style_mode'] === 'dark');
+                $features = json_decode($plan['features'], true) ?? [];
+                
+                // Styles based on mode
+                $cardClass = $isDark ? 'bg-gray-900 text-white border border-gray-700' : 'bg-white text-gray-800';
+                $priceColor = $isDark ? 'text-orange-500' : 'text-green-700';
+                $checkColor = $isDark ? 'text-orange-500' : 'text-green-500';
+                $btnClass = $isDark ? 'bg-orange-600 hover:bg-orange-700' : 'bg-green-700 hover:bg-green-800';
+            ?>
+                <div class="<?php echo $cardClass; ?> rounded-2xl p-8 shadow-2xl transform transition hover:scale-105 relative overflow-hidden">
+                    
+                    <?php if (!empty($plan['badge_text'])): ?>
+                        <div class="absolute top-0 right-0 bg-green-600 text-white px-4 py-1 rounded-bl-lg font-bold text-sm">
+                            <?php echo htmlspecialchars($plan['badge_text']); ?>
+                        </div>
+                    <?php endif; ?>
 
-                <ul class="space-y-3 mb-8">
-                    <li class="flex items-center"><span
-                            class="material-symbols-outlined text-green-500 mr-2">check</span> Pickup: Science City /
-                        Esplanade</li>
-                    <li class="flex items-center"><span
-                            class="material-symbols-outlined text-green-500 mr-2">check</span> All Meals Included</li>
-                    <li class="flex items-center"><span
-                            class="material-symbols-outlined text-green-500 mr-2">check</span> Boat Permit & Guide Fees
-                    </li>
-                </ul>
-                <button
-                    class="w-full py-4 bg-green-700 hover:bg-green-800 text-white rounded-xl font-bold transition shadow-lg">Book
-                    Group Tour</button>
-            </div>
+                    <h3 class="text-2xl font-bold mb-2"><?php echo htmlspecialchars($plan['title']); ?></h3>
+                    <p class="<?php echo $isDark ? 'text-gray-400' : 'text-gray-500'; ?> text-sm mb-6">
+                        <?php echo htmlspecialchars($plan['subtitle']); ?>
+                    </p>
+                    
+                    <div class="text-5xl font-bold <?php echo $priceColor; ?> mb-6">
+                        ₹<?php echo htmlspecialchars($plan['price']); ?>
+                        <span class="text-lg text-gray-400 font-normal"><?php echo htmlspecialchars($plan['price_unit']); ?></span>
+                    </div>
 
-            <div
-                class="bg-gray-900 rounded-2xl p-8 text-white shadow-2xl transform transition hover:scale-105 border border-gray-700">
-                <h3 class="text-2xl font-bold mb-2">Private Boat</h3>
-                <p class="text-gray-400 text-sm mb-6">Exclusive experience for your family or friends group.</p>
-                <div class="text-5xl font-bold text-orange-500 mb-6">₹16,000<span
-                        class="text-lg text-gray-400 font-normal">/group (1-4 pax)</span></div>
-                <p class="text-xs text-gray-400 -mt-4 mb-6">+ ₹1500 per extra person</p>
-
-                <ul class="space-y-3 mb-8">
-                    <li class="flex items-center"><span
-                            class="material-symbols-outlined text-orange-500 mr-2">check</span> Private Car Pickup</li>
-                    <li class="flex items-center"><span
-                            class="material-symbols-outlined text-orange-500 mr-2">check</span> Exclusive Boat (No
-                        strangers)</li>
-                    <li class="flex items-center"><span
-                            class="material-symbols-outlined text-orange-500 mr-2">check</span> Customized Food Menu
-                    </li>
-                </ul>
-                <button
-                    class="w-full py-4 bg-orange-600 hover:bg-orange-700 text-white rounded-xl font-bold transition shadow-lg">Request
-                    Private Quote</button>
-            </div>
+                    <ul class="space-y-3 mb-8">
+                        <?php foreach ($features as $feature): ?>
+                            <li class="flex items-center">
+                                <span class="material-symbols-outlined <?php echo $checkColor; ?> mr-2">check</span>
+                                <?php echo htmlspecialchars($feature); ?>
+                            </li>
+                        <?php endforeach; ?>
+                    </ul>
+                    
+                    <button onclick="document.getElementById('inquiryModal').classList.remove('hidden')" 
+                        class="w-full py-4 <?php echo $btnClass; ?> text-white rounded-xl font-bold transition shadow-lg">
+                        <?php echo htmlspecialchars($plan['btn_text']); ?>
+                    </button>
+                </div>
+            <?php endforeach; ?>
         </div>
     </div>
 </section>
 
-<section class="py-12 bg-white">
+<section class="pt-12 pb-56 bg-white">
     <div class="max-w-4xl mx-auto px-4 text-center">
         <h3 class="text-xl font-bold text-gray-700 mb-8">Wildlife Spotting Probability (This Season)</h3>
         <div class="flex justify-center gap-8 flex-wrap">
@@ -456,3 +456,10 @@
 </section>
 
 <?php include 'footer.php'; ?>
+
+<script>
+    (g=>{var h,a,k,p="The Google Maps JavaScript API",c="google",l="importLibrary",q="__ib__",m=document,b=window;b=b[c]||(b[c]={});var d=b.maps||(b.maps={}),r=new Set,e=new URLSearchParams,u=()=>h||(h=new Promise(async(f,n)=>{await (a=m.createElement("script"));e.set("libraries",[...r]+"");for(k in g)e.set(k.replace(/[A-Z]/g,t=>"_"+t[0].toLowerCase()),g[k]);e.set("callback",c+".maps."+q);a.src=`https://maps.${c}apis.com/maps/api/js?`+e;d[q]=f;a.onerror=()=>h=n(Error(p+" could not load."));a.nonce=m.querySelector("script[nonce]")?.nonce||"";m.head.append(a)}));d[l]?console.warn(p+" only loads once. Ignoring:",g):d[l]=(f,...n)=>r.add(f)&&u().then(()=>d[l](f,...n))})({
+        key: "YOUR_API_KEY", // <--- INSERT API KEY HERE
+        v: "weekly",
+    });
+</script>

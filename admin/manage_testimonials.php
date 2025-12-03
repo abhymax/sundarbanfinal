@@ -9,9 +9,8 @@ if (!isset($_SESSION['admin_logged_in'])) {
 
 // Handle Delete
 if (isset($_GET['delete'])) {
-    $id = $_GET['delete'];
     $stmt = $pdo->prepare("DELETE FROM testimonials WHERE id = ?");
-    $stmt->execute([$id]);
+    $stmt->execute([$_GET['delete']]);
     header("Location: manage_testimonials.php");
     exit;
 }
@@ -38,139 +37,119 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 // Fetch Testimonials
 $stmt = $pdo->query("SELECT * FROM testimonials ORDER BY created_at DESC");
 $testimonials = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+include 'header.php';
 ?>
-<!DOCTYPE html>
-<html lang="en">
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manage Testimonials | Admin</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
+<div class="max-w-6xl mx-auto">
+    <div class="mb-8">
+        <h1 class="text-4xl font-bold text-safari-dark font-serif">Testimonials</h1>
+        <p class="text-gray-500 mt-2">What your guests are saying.</p>
+    </div>
 
-<body class="bg-gray-100">
-    <div class="flex min-h-screen">
-        <!-- Sidebar -->
-        <aside class="w-64 bg-gray-900 text-white min-h-screen hidden md:block">
-            <div class="p-6">
-                <h2 class="text-2xl font-bold text-orange-500">Admin Panel</h2>
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div class="lg:col-span-1">
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 sticky top-6">
+                <h2 class="text-xl font-bold text-safari-dark mb-4 flex items-center gap-2">
+                    <span class="material-symbols-outlined text-tiger-yellow">rate_review</span> Add Review
+                </h2>
+                
+                <form method="POST" class="space-y-4">
+                    <input type="hidden" name="id" id="tId">
+                    
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-1">Name</label>
+                        <input type="text" name="name" id="tName" required
+                            class="w-full rounded-lg border-gray-300 border p-2 focus:ring-2 focus:ring-safari-green outline-none transition">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-1">Location</label>
+                        <input type="text" name="location" id="tLocation" required
+                            class="w-full rounded-lg border-gray-300 border p-2 focus:ring-2 focus:ring-safari-green outline-none transition">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-1">Rating</label>
+                        <div class="flex items-center gap-2">
+                            <input type="number" name="rating" id="tRating" min="1" max="5" value="5" required
+                                class="w-20 rounded-lg border-gray-300 border p-2 focus:ring-2 focus:ring-safari-green outline-none transition">
+                            <span class="text-yellow-500 text-lg">★★★★★</span>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-1">Review</label>
+                        <textarea name="text" id="tText" rows="4" required
+                            class="w-full rounded-lg border-gray-300 border p-2 focus:ring-2 focus:ring-safari-green outline-none transition"></textarea>
+                    </div>
+
+                    <div class="flex gap-2 pt-2">
+                        <button type="button" onclick="resetForm()"
+                            class="flex-1 px-4 py-2 text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-xl transition font-bold text-sm">Cancel</button>
+                        <button type="submit" class="flex-1 px-4 py-2 bg-safari-green text-white hover:bg-green-800 rounded-xl transition font-bold text-sm shadow-md">Save</button>
+                    </div>
+                </form>
             </div>
-            <nav class="mt-6">
-                <a href="dashboard.php" class="block py-3 px-6 hover:bg-gray-800">Dashboard</a>
-                <a href="manage_testimonials.php"
-                    class="block py-3 px-6 bg-gray-800 border-l-4 border-orange-500">Testimonials</a>
-                <a href="manage_packages.php" class="block py-3 px-6 hover:bg-gray-800">Packages</a>
-                <a href="settings.php" class="block py-3 px-6 hover:bg-gray-800">General Settings</a>
-                <a href="manage_menu.php" class="block py-3 px-6 hover:bg-gray-800">Manage Menu</a>
-                <a href="logout.php" class="block py-3 px-6 hover:bg-red-600 mt-10">Logout</a>
-            </nav>
-        </aside>
+        </div>
 
-        <!-- Main Content -->
-        <main class="flex-1 p-8">
-            <div class="flex justify-between items-center mb-8">
-                <h1 class="text-3xl font-bold text-gray-800">Manage Testimonials</h1>
-                <button onclick="openModal()"
-                    class="bg-orange-600 text-white px-4 py-2 rounded-lg font-bold hover:bg-orange-700">
-                    + Add Testimonial
-                </button>
-            </div>
-
-            <div class="bg-white rounded-xl shadow-md overflow-hidden">
-                <table class="w-full text-left border-collapse">
-                    <thead>
-                        <tr class="bg-gray-50 border-b">
-                            <th class="p-4 font-bold text-gray-600">Name</th>
-                            <th class="p-4 font-bold text-gray-600">Location</th>
-                            <th class="p-4 font-bold text-gray-600">Rating</th>
-                            <th class="p-4 font-bold text-gray-600">Review</th>
-                            <th class="p-4 font-bold text-gray-600 text-right">Actions</th>
+        <div class="lg:col-span-2">
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+                <table class="w-full text-left">
+                    <thead class="bg-gray-50 text-gray-500 text-xs uppercase tracking-wider">
+                        <tr>
+                            <th class="px-6 py-3 font-bold">User</th>
+                            <th class="px-6 py-3 font-bold">Review</th>
+                            <th class="px-6 py-3 font-bold text-right">Actions</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody class="divide-y divide-gray-100 text-sm">
                         <?php foreach ($testimonials as $t): ?>
-                            <tr class="border-b hover:bg-gray-50">
-                                <td class="p-4 font-medium text-gray-800"><?php echo htmlspecialchars($t['name']); ?></td>
-                                <td class="p-4 text-gray-600 text-sm"><?php echo htmlspecialchars($t['location']); ?></td>
-                                <td class="p-4 text-yellow-500 font-bold"><?php echo $t['rating']; ?> ★</td>
-                                <td class="p-4 text-gray-600 text-sm max-w-xs truncate">
-                                    <?php echo htmlspecialchars($t['text']); ?></td>
-                                <td class="p-4 text-right space-x-2">
+                            <tr class="hover:bg-gray-50 transition">
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="font-bold text-gray-900"><?php echo htmlspecialchars($t['name']); ?></div>
+                                    <div class="text-xs text-gray-500"><?php echo htmlspecialchars($t['location']); ?></div>
+                                    <div class="text-yellow-500 text-xs mt-1">
+                                        <?php for($i=0; $i<$t['rating']; $i++) echo '★'; ?>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <p class="text-gray-600 italic">"<?php echo htmlspecialchars($t['text']); ?>"</p>
+                                </td>
+                                <td class="px-6 py-4 text-right whitespace-nowrap">
                                     <button onclick='editTestimonial(<?php echo json_encode($t); ?>)'
-                                        class="text-blue-600 hover:text-blue-800 font-medium">Edit</button>
+                                        class="text-blue-600 hover:bg-blue-50 p-2 rounded-lg transition mr-1"><span class="material-symbols-outlined text-sm">edit</span></button>
                                     <a href="?delete=<?php echo $t['id']; ?>" onclick="return confirm('Are you sure?')"
-                                        class="text-red-600 hover:text-red-800 font-medium">Delete</a>
+                                        class="text-red-600 hover:bg-red-50 p-2 rounded-lg transition"><span class="material-symbols-outlined text-sm">delete</span></a>
                                 </td>
                             </tr>
                         <?php endforeach; ?>
                     </tbody>
                 </table>
             </div>
-        </main>
-    </div>
-
-    <!-- Modal -->
-    <div id="modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center">
-        <div class="bg-white p-8 rounded-xl shadow-2xl w-full max-w-md">
-            <h2 id="modalTitle" class="text-2xl font-bold mb-6 text-gray-800">Add Testimonial</h2>
-            <form method="POST">
-                <input type="hidden" name="id" id="tId">
-                <div class="mb-4">
-                    <label class="block text-sm font-bold text-gray-700 mb-1">Name</label>
-                    <input type="text" name="name" id="tName" class="w-full border rounded px-3 py-2" required>
-                </div>
-                <div class="mb-4">
-                    <label class="block text-sm font-bold text-gray-700 mb-1">Location</label>
-                    <input type="text" name="location" id="tLocation" class="w-full border rounded px-3 py-2" required>
-                </div>
-                <div class="mb-4">
-                    <label class="block text-sm font-bold text-gray-700 mb-1">Rating (1-5)</label>
-                    <input type="number" name="rating" id="tRating" min="1" max="5"
-                        class="w-full border rounded px-3 py-2" required>
-                </div>
-                <div class="mb-6">
-                    <label class="block text-sm font-bold text-gray-700 mb-1">Review Text</label>
-                    <textarea name="text" id="tText" rows="4" class="w-full border rounded px-3 py-2"
-                        required></textarea>
-                </div>
-                <div class="flex justify-end gap-3">
-                    <button type="button" onclick="closeModal()"
-                        class="px-4 py-2 text-gray-600 hover:text-gray-800">Cancel</button>
-                    <button type="submit"
-                        class="bg-orange-600 text-white px-4 py-2 rounded font-bold hover:bg-orange-700">Save</button>
-                </div>
-            </form>
         </div>
     </div>
 
     <script>
-        function openModal() {
-            document.getElementById('modal').classList.remove('hidden');
-            document.getElementById('modal').classList.add('flex');
-            document.getElementById('modalTitle').innerText = 'Add Testimonial';
+        function editTestimonial(t) {
+            document.getElementById('tId').value = t.id;
+            document.getElementById('tName').value = t.name;
+            document.getElementById('tLocation').value = t.location;
+            document.getElementById('tRating').value = t.rating;
+            document.getElementById('tText').value = t.text;
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        function resetForm() {
             document.getElementById('tId').value = '';
             document.getElementById('tName').value = '';
             document.getElementById('tLocation').value = '';
             document.getElementById('tRating').value = '5';
             document.getElementById('tText').value = '';
         }
-
-        function closeModal() {
-            document.getElementById('modal').classList.add('hidden');
-            document.getElementById('modal').classList.remove('flex');
-        }
-
-        function editTestimonial(t) {
-            openModal();
-            document.getElementById('modalTitle').innerText = 'Edit Testimonial';
-            document.getElementById('tId').value = t.id;
-            document.getElementById('tName').value = t.name;
-            document.getElementById('tLocation').value = t.location;
-            document.getElementById('tRating').value = t.rating;
-            document.getElementById('tText').value = t.text;
-        }
     </script>
-</body>
+</div>
 
+</main>
+</div>
+</body>
 </html>
