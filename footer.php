@@ -75,7 +75,6 @@ try {
                             </h4>
                             <div class="footer-links text-gray-400 text-base space-y-3 [&_li]:flex [&_li]:items-center [&_a]:flex [&_a]:items-center [&_a]:gap-2 [&_a]:transition-colors [&_a:hover]:text-[#FFD700]">
                                 <?php 
-                                // Add chevron icon to links automatically
                                 $content = $section['content'];
                                 $icon = '<span class="material-symbols-outlined text-[#FFD700] text-sm">chevron_right</span>';
                                 echo str_replace('<a href', $icon . '<a href', $content); 
@@ -152,7 +151,7 @@ try {
      <span class="material-symbols-outlined text-2xl">arrow_upward</span>
 </button>
 
-<div id="bookingModal" class="fixed inset-0 z-[100] hidden" style="display: none;">
+<div id="booking-modal" class="fixed inset-0 z-[100] hidden" style="display: none;">
     <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" onclick="closeBooking()"></div>
     <div id="bookingSidebar" class="absolute right-0 top-0 h-full w-full md:w-[450px] bg-white shadow-2xl transform translate-x-full transition-transform duration-300 flex flex-col">
         <div class="p-6 border-b flex justify-between items-center bg-[#051105] text-white">
@@ -164,6 +163,7 @@ try {
         </div>
         <div class="flex-1 p-8 overflow-y-auto bg-gray-50">
             <div id="form-status" class="hidden p-4 mb-4 rounded-lg border text-sm"></div>
+            
             <form id="booking-form" class="space-y-5">
                 <div>
                     <label class="block text-xs font-bold uppercase text-gray-500 mb-1 tracking-wider">Select Package</label>
@@ -175,8 +175,8 @@ try {
                     </select>
                 </div>
                 <div class="grid grid-cols-2 gap-4">
-                    <div><label class="block text-xs font-bold uppercase text-gray-500 mb-1 tracking-wider">Date</label><input type="date" name="date" id="modal-date" class="w-full border border-gray-300 rounded-lg px-4 py-3 text-gray-800 focus:ring-2 focus:ring-green-900 transition"></div>
-                    <div><label class="block text-xs font-bold uppercase text-gray-500 mb-1 tracking-wider">Travelers</label><select name="travelers" id="modal-travelers" class="w-full border border-gray-300 rounded-lg px-4 py-3 text-gray-800 focus:ring-2 focus:ring-green-900 transition"><option>2</option><option>3</option><option>4</option><option>5+</option></select></div>
+                    <div><label class="block text-xs font-bold uppercase text-gray-500 mb-1 tracking-wider">Date</label><input type="date" name="travel_date" id="modal-date" class="w-full border border-gray-300 rounded-lg px-4 py-3 text-gray-800 focus:ring-2 focus:ring-green-900 transition"></div>
+                    <div><label class="block text-xs font-bold uppercase text-gray-500 mb-1 tracking-wider">Travelers</label><select name="adults" id="modal-travelers" class="w-full border border-gray-300 rounded-lg px-4 py-3 text-gray-800 focus:ring-2 focus:ring-green-900 transition"><option>2</option><option>3</option><option>4</option><option>5+</option></select></div>
                 </div>
                 <div><label class="block text-xs font-bold uppercase text-gray-500 mb-1 tracking-wider">Full Name</label><input type="text" name="name" required class="w-full border border-gray-300 rounded-lg px-4 py-3 text-gray-800 focus:ring-2 focus:ring-green-900 transition" placeholder="John Doe"></div>
                 <div><label class="block text-xs font-bold uppercase text-gray-500 mb-1 tracking-wider">Phone</label><input type="tel" name="phone" required class="w-full border border-gray-300 rounded-lg px-4 py-3 text-gray-800 focus:ring-2 focus:ring-green-900 transition" placeholder="+91..."></div>
@@ -197,16 +197,15 @@ try {
 </div>
 
 <script>
-    function openBooking() { const m=document.getElementById('bookingModal'), s=document.getElementById('bookingSidebar'); if(m&&s){ m.classList.remove('hidden'); m.style.display='block'; setTimeout(()=>{s.classList.remove('translate-x-full')},10); } }
-    function closeBooking() { const m=document.getElementById('bookingModal'), s=document.getElementById('bookingSidebar'); if(m&&s){ s.classList.add('translate-x-full'); setTimeout(()=>{m.classList.add('hidden');m.style.display='none'},300); } }
+    // Functions for opening/closing modal with new ID
+    function openBooking() { const m=document.getElementById('booking-modal'), s=document.getElementById('bookingSidebar'); if(m&&s){ m.classList.remove('hidden'); m.style.display='block'; setTimeout(()=>{s.classList.remove('translate-x-full')},10); } }
+    function closeBooking() { const m=document.getElementById('booking-modal'), s=document.getElementById('bookingSidebar'); if(m&&s){ s.classList.add('translate-x-full'); setTimeout(()=>{m.classList.add('hidden');m.style.display='none'},300); } }
     
     // Back to Top Logic
     const backToTopBtn = document.getElementById("backToTopBtn");
     window.onscroll = function() {
-        // Show button after scrolling down 300px
         if (document.body.scrollTop > 300 || document.documentElement.scrollTop > 300) {
             backToTopBtn.classList.remove("hidden");
-            // Small delay to allow display:block to apply before changing opacity
             setTimeout(() => {
                 backToTopBtn.classList.remove("opacity-0");
             }, 10);
@@ -220,24 +219,8 @@ try {
     function scrollToTop() {
         window.scrollTo({top: 0, behavior: 'smooth'});
     }
-
-    document.addEventListener('DOMContentLoaded', ()=>{
-        const f=document.getElementById('booking-form');
-        if(f) f.addEventListener('submit', e=>{
-            e.preventDefault(); const btn=document.getElementById('submit-btn'), st=document.getElementById('form-status');
-            btn.disabled=true; btn.innerHTML='<span class="material-symbols-outlined animate-spin">refresh</span> Sending...';
-            fetch('submit_booking.php',{method:'POST',body:new FormData(f)}).then(r=>r.json()).then(d=>{
-                st.classList.remove('hidden','bg-green-100','text-green-800','bg-red-100','text-red-800'); st.style.display='block';
-                if(d.status==='success'){
-                    st.classList.add('bg-green-100','text-green-800'); st.innerHTML=`<div class="flex items-center gap-2"><span class="material-symbols-outlined">check_circle</span> ${d.message}</div>`;
-                    f.reset(); setTimeout(()=>{closeBooking();st.style.display='none'},3000);
-                } else {
-                    st.classList.add('bg-red-100','text-red-800'); st.innerHTML=`<div class="flex items-center gap-2"><span class="material-symbols-outlined">error</span> ${d.message}</div>`;
-                }
-            }).catch(()=>alert("Error")).finally(()=>{btn.disabled=false;btn.innerHTML='Confirm Inquiry <span class="material-symbols-outlined text-sm">send</span>'});
-        });
-    });
 </script>
+
 <script src="script.js"></script>
 </body>
 </html>

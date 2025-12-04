@@ -770,3 +770,4 @@
 [03-Dec-2025 23:30:36 UTC] PHP Warning:  foreach() argument must be of type array|object, null given in /home/s4rgthy671q/public_html/footer.php on line 105
 [03-Dec-2025 23:41:05 UTC] PHP Warning:  Undefined variable $packages in /home/s4rgthy671q/public_html/footer.php on line 105
 [03-Dec-2025 23:41:05 UTC] PHP Warning:  foreach() argument must be of type array|object, null given in /home/s4rgthy671q/public_html/footer.php on line 105
+[04-Dec-2025 20:57:39 UTC] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in /home/s4rgthy671q/public_html/1-night-2-days-tour.php on line 55
