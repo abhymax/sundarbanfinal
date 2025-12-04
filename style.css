@@ -14,7 +14,16 @@ h4,
 .font-serif {
     font-family: 'Playfair Display', serif;
 }
+/* Social Icons Hover Effect (Matches Header) */
+.social-icon:hover path { 
+    fill: #f97316; /* Tailwind orange-500/tiger-orange equivalent */
+    transition: fill 0.3s ease; 
+}
 
+/* Ensure Back to Top button transitions smoothly */
+#backToTopBtn {
+    transition: opacity 0.3s ease, transform 0.3s ease, background-color 0.3s;
+}
 /* Colors defined via Variables at bottom */
 
 /* Utility: Glass Effect */
