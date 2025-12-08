@@ -209,7 +209,19 @@ try {
             <?php endforeach; ?>
         </div>
     </div>
-</section>
+
+    <div class="max-w-7xl mx-auto px-4 relative z-10 text-center mt-12">
+        <a href="https://share.google/pPARQ1fOGvqUFHZtr" target="_blank" 
+           class="inline-flex items-center gap-3 px-8 py-4 rounded-full bg-white text-[#1a2e1a] font-bold hover:bg-tiger-orange hover:text-black transition-all duration-300 shadow-xl transform hover:-translate-y-1 group">
+            
+            <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0OCA0OCI+PHBhdGggZmlsbD0iI0VBNDMzNSIgZD0iTTI0IDkuNWMzLjU0IDAgNi43MSAxLjIyIDkuMjEgMy42bDYuODUtNi44NUMzNS45IDIuMzggMzAuNDcgMCAyNCAwIDE0LjYyIDAgNi41MSA1LjM4IDIuNTYgMTMuMjJsNy45OCA2LjE5QzEyLjQzIDEzLjcyIDE3Ljc0IDkuNSAyNCA5LjV6Ii8+PHBhdGggZmlsbD0iIzQyODVGNCIgZD0iTTQ2Ljk4IDI0LjU1YzAgLTEuNTctLjE1LTMuMDktLjQ2LTQuNTVIMjR2OS4wOWgxMi45MmMtLjU1IDIuOTMtMi4yNiA1LjQxLTQuODIgNy4xOGw3LjgyIDYuMDRjNC41Ny00LjIzIDcuMjEtMTAuNDkgNy4yMS0xNy43NnoiLz48cGF0aCBmaWxsPSIjRkJCQzA1IiBkPSJNMTAuNTMgMjguNTljLS40OC0xLjQ1LS43Ni0yLjk5LS43Ni00LjU5cy4yNy0zLjE0Ljc2LTQuNTlsLTcuOTgtNi4xOUMuOTIgMTYuNDYgMCAyMC4xMiAwIDI0YzAgMy44OC45MiA3LjU0IDIuNTYgMTAuNzhsNy45Ny02LjE5eiIvPjxwYXRoIGZpbGw9IiMzNEE4NTMiIGQ9Ik0yNCA0OGM2LjQ4IDAgMTEuOTMtMi4xMyAxNS44OS01LjgxbC03LjgyLTYuMDRjLTIuMTQgMS40NC00Ljg4IDIuMzUtOC4wNyAyLjM1LTYuMjYgMC0xMS41Ny00LjIyLTEzLjQ3LTkuOTFsLTcuOTggNi4xOUM2LjUxIDQyLjYyIDE0LjYyIDQ4IDI0IDQ4eiIvPjwvc3ZnPg==" 
+                 alt="Google" class="w-6 h-6">
+                 
+            <span>Review us on Google</span>
+        </a>
+    </div>
+    ```
+    </section>
 
 <section class="py-16 md:py-24 bg-safari-green text-white">
     <div class="max-w-4xl mx-auto px-4">

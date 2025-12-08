@@ -39,7 +39,7 @@ function getItinColorClasses($color) {
     }
 }
 
-// Render Function (Moved to top to prevent syntax errors)
+// Render Function
 function renderEvent($event, $index) {
     $isEven = ($index % 2 == 0); 
     $colors = getItinColorClasses($event['color_theme']);
@@ -124,7 +124,35 @@ include 'header.php';
                 Get Quote <span class="material-symbols-outlined text-sm md:text-lg">currency_rupee</span>
             </a>
         </div>
-    </div>
+
+        <div class="glass-card rounded-2xl p-4 md:p-6 max-w-4xl mx-auto shadow-2xl border-t border-white/40 hidden md:block mt-10 bg-white/90 backdrop-blur-xl text-left">
+            <div class="grid grid-cols-4 gap-4 items-center">
+                <div class="text-left border-r border-gray-300 px-4">
+                    <label class="block text-[10px] uppercase text-gray-500 font-bold mb-1 tracking-wider">Date</label>
+                    <input id="hero-date" class="bg-transparent text-gray-900 font-bold w-full outline-none cursor-pointer placeholder-gray-500" type="date">
+                </div>
+                <div class="text-left border-r border-gray-300 px-4">
+                    <label class="block text-[10px] uppercase text-gray-500 font-bold mb-1 tracking-wider">Guests</label>
+                    <select id="hero-guests" class="bg-transparent text-gray-900 font-bold w-full outline-none cursor-pointer">
+                        <option value="2">2 Travelers</option>
+                        <option value="4">4 Travelers</option>
+                        <option value="6">6+ Group</option>
+                    </select>
+                </div>
+                <div class="text-left border-r border-gray-300 px-4">
+                    <label class="block text-xs uppercase text-gray-500 font-bold mb-1">Package</label>
+                    <select id="hero-package" class="bg-transparent text-gray-900 font-bold w-full outline-none cursor-pointer">
+                        <option value="1 Day Tour">1 Day Tour</option>
+                        <option value="1 Night 2 Days" selected>1 Night 2 Days</option>
+                        <option value="2 Nights 3 Days">2 Nights 3 Days</option>
+                    </select>
+                </div>
+                <button id="hero-check-btn" class="bg-safari-green text-white h-12 rounded-xl font-bold hover:bg-green-900 transition flex items-center justify-center gap-2 shadow-lg text-sm">
+                    Check Availability
+                </button>
+            </div>
+        </div>
+        </div>
 
     <div class="absolute bottom-10 left-1/2 transform -translate-x-1/2 animate-bounce text-white/80 hidden md:block">
         <span class="material-symbols-outlined text-4xl">keyboard_double_arrow_down</span>
@@ -299,6 +327,151 @@ include 'header.php';
     </div>
 </section>
 
+<section id="guidelines" class="py-16 md:py-24 bg-white border-t border-gray-100">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
+        
+        <div>
+            <div class="text-center mb-10">
+                <span class="text-safari-green font-bold tracking-widest uppercase text-xs md:text-sm">Essentials</span>
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mt-2 font-serif">Inclusions & Exclusions</h2>
+            </div>
+
+            <div class="bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-200 flex flex-col md:flex-row">
+                <div class="p-8 md:p-10 bg-[#f2f9f0] w-full md:w-1/2">
+                    <h3 class="text-xl font-bold text-safari-green mb-6 flex items-center gap-2">
+                        <span class="material-symbols-outlined bg-green-200 p-1.5 rounded-full text-green-800 text-sm">check</span> 
+                        What's Included
+                    </h3>
+                    <ul class="space-y-4">
+                        <li class="flex gap-3 text-sm text-gray-700 items-start">
+                            <span class="material-symbols-outlined text-green-600 text-lg shrink-0 mt-0.5">directions_car</span>
+                            <span>Pick up & Drop from Canning To Godhkhali Ferrighat by Auto / Tata Magic.</span>
+                        </li>
+                        <li class="flex gap-3 text-sm text-gray-700 items-start">
+                            <span class="material-symbols-outlined text-green-600 text-lg shrink-0 mt-0.5">hotel</span>
+                            <span>Accommodation Standard Room Ac / Non Ac.</span>
+                        </li>
+                        <li class="flex gap-3 text-sm text-gray-700 items-start">
+                            <span class="material-symbols-outlined text-green-600 text-lg shrink-0 mt-0.5">houseboat</span>
+                            <span>Mechanised well maintained Boat with beds and European Toilet.</span>
+                        </li>
+                        <li class="flex gap-3 text-sm text-gray-700 items-start">
+                            <span class="material-symbols-outlined text-green-600 text-lg shrink-0 mt-0.5">restaurant</span>
+                            <span>All major meals: Breakfast, Lunch, Evening tea Snacks, Dinner, Bed tea.</span>
+                        </li>
+                        <li class="flex gap-3 text-sm text-gray-700 items-start">
+                            <span class="material-symbols-outlined text-green-600 text-lg shrink-0 mt-0.5">theater_comedy</span>
+                            <span>Evening Cultural Programme.</span>
+                        </li>
+                        <li class="flex gap-3 text-sm text-gray-700 items-start">
+                            <span class="material-symbols-outlined text-green-600 text-lg shrink-0 mt-0.5">local_police</span>
+                            <span>Jungle entry fees, guide charges, boat permits & camera permissions.</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="p-8 md:p-10 bg-white w-full md:w-1/2 border-t md:border-t-0 md:border-l border-gray-100">
+                    <h3 class="text-xl font-bold text-gray-500 mb-6 flex items-center gap-2">
+                        <span class="material-symbols-outlined bg-red-100 p-1.5 rounded-full text-red-500 text-sm">close</span> 
+                        What's Excluded
+                    </h3>
+                    <ul class="space-y-4">
+                        <li class="flex gap-3 text-sm text-gray-600 items-start">
+                            <span class="material-symbols-outlined text-red-400 text-lg shrink-0 mt-0.5">no_drinks</span>
+                            <span>Any Hard or Aerated Drinks.</span>
+                        </li>
+                        <li class="flex gap-3 text-sm text-gray-600 items-start">
+                            <span class="material-symbols-outlined text-red-400 text-lg shrink-0 mt-0.5">videocam_off</span>
+                            <span>Video camera charges.</span>
+                        </li>
+                        <li class="flex gap-3 text-sm text-gray-600 items-start">
+                            <span class="material-symbols-outlined text-red-400 text-lg shrink-0 mt-0.5">attach_money</span>
+                            <span>Any miscellaneous expenses incurred by the guests.</span>
+                        </li>
+                        <li class="flex gap-3 text-sm text-gray-600 items-start">
+                            <span class="material-symbols-outlined text-red-400 text-lg shrink-0 mt-0.5">luggage</span>
+                            <span>Coolie Charge.</span>
+                        </li>
+                        <li class="flex gap-3 text-sm text-gray-600 items-start">
+                            <span class="material-symbols-outlined text-red-400 text-lg shrink-0 mt-0.5">public</span>
+                            <span><strong>Non-Indian guests:</strong> Permit fees inside Tiger Reserve payable separately.</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div>
+            <h3 class="text-2xl font-serif font-bold text-safari-green mb-6 flex items-center gap-3">
+                <span class="material-symbols-outlined text-tiger-orange text-3xl">backpack</span> Things to Carry
+            </h3>
+            <div class="bg-safari-green rounded-3xl p-6 md:p-8 relative overflow-hidden shadow-2xl">
+                <div class="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none"></div>
+                
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 relative z-10">
+                    <div class="bg-white/10 backdrop-blur-sm p-4 rounded-xl text-center border border-white/10 hover:bg-white/20 transition group">
+                        <span class="material-symbols-outlined text-3xl text-tiger-orange mb-2 group-hover:scale-110 transition-transform">medication</span>
+                        <p class="text-white text-xs font-bold leading-tight">Specific Medicines</p>
+                    </div>
+                    <div class="bg-white/10 backdrop-blur-sm p-4 rounded-xl text-center border border-white/10 hover:bg-white/20 transition group">
+                        <span class="material-symbols-outlined text-3xl text-tiger-orange mb-2 group-hover:scale-110 transition-transform">badge</span>
+                        <p class="text-white text-xs font-bold leading-tight">Valid Photo ID</p>
+                    </div>
+                    <div class="bg-white/10 backdrop-blur-sm p-4 rounded-xl text-center border border-white/10 hover:bg-white/20 transition group">
+                        <span class="material-symbols-outlined text-3xl text-tiger-orange mb-2 group-hover:scale-110 transition-transform">flight_takeoff</span>
+                        <p class="text-white text-xs font-bold leading-tight">Passport (Foreigners)</p>
+                    </div>
+                    <div class="bg-white/10 backdrop-blur-sm p-4 rounded-xl text-center border border-white/10 hover:bg-white/20 transition group">
+                        <span class="material-symbols-outlined text-3xl text-tiger-orange mb-2 group-hover:scale-110 transition-transform">photo_camera</span>
+                        <p class="text-white text-xs font-bold leading-tight">Camera / Binoculars</p>
+                    </div>
+                    <div class="bg-white/10 backdrop-blur-sm p-4 rounded-xl text-center border border-white/10 hover:bg-white/20 transition group">
+                        <span class="material-symbols-outlined text-3xl text-tiger-orange mb-2 group-hover:scale-110 transition-transform">shopping_bag</span>
+                        <p class="text-white text-xs font-bold leading-tight">Light Baggage</p>
+                    </div>
+                    <div class="bg-white/10 backdrop-blur-sm p-4 rounded-xl text-center border border-white/10 hover:bg-white/20 transition group">
+                        <span class="material-symbols-outlined text-3xl text-tiger-orange mb-2 group-hover:scale-110 transition-transform">do_not_step</span>
+                        <p class="text-white text-xs font-bold leading-tight">Comfortable Footwear</p>
+                    </div>
+                    <div class="bg-white/10 backdrop-blur-sm p-4 rounded-xl text-center border border-white/10 hover:bg-white/20 transition group">
+                        <span class="material-symbols-outlined text-3xl text-tiger-orange mb-2 group-hover:scale-110 transition-transform">wb_sunny</span>
+                        <p class="text-white text-xs font-bold leading-tight">Sunglasses / Hat / Sun Tan Lotion</p>
+                    </div>
+                    <div class="bg-white/10 backdrop-blur-sm p-4 rounded-xl text-center border border-white/10 hover:bg-white/20 transition group">
+                        <span class="material-symbols-outlined text-3xl text-tiger-orange mb-2 group-hover:scale-110 transition-transform">payments</span>
+                        <p class="text-white text-xs font-bold leading-tight">Cash (ATM Remote)</p>
+                    </div>
+                </div>
+                <p class="text-center text-green-200/80 text-xs mt-6 italic">*Only SBI ATM available at Gosaba</p>
+            </div>
+        </div>
+
+        <div>
+             <h3 class="text-2xl font-serif font-bold text-safari-green mb-6 flex items-center gap-2">
+                <span class="material-symbols-outlined text-tiger-orange">child_care</span> Child Policy
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="bg-orange-50 border border-orange-200 p-6 rounded-2xl flex flex-col items-center text-center shadow-sm hover:shadow-md transition">
+                    <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center text-2xl shadow-sm mb-3">👶</div>
+                    <h4 class="font-bold text-gray-800">1 to 4 Years</h4>
+                    <span class="inline-block bg-green-600 text-white text-xs font-bold px-3 py-1 rounded-full mt-2">FREE</span>
+                </div>
+                 <div class="bg-blue-50 border border-blue-200 p-6 rounded-2xl flex flex-col items-center text-center shadow-sm hover:shadow-md transition">
+                    <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center text-2xl shadow-sm mb-3">👦</div>
+                    <h4 class="font-bold text-gray-800">4 to 8 Years</h4>
+                    <span class="inline-block bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full mt-2">50% Charge</span>
+                </div>
+                 <div class="bg-gray-50 border border-gray-200 p-6 rounded-2xl flex flex-col items-center text-center shadow-sm hover:shadow-md transition">
+                    <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center text-2xl shadow-sm mb-3">🧑</div>
+                    <h4 class="font-bold text-gray-800">Above 8 Years</h4>
+                    <span class="inline-block bg-gray-700 text-white text-xs font-bold px-3 py-1 rounded-full mt-2">Full Charge</span>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</section>
+
 <section id="pricing" class="py-12 md:py-20 leaf-pattern text-white relative">
     <div class="absolute inset-0 bg-green-900/90 z-0"></div>
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
@@ -311,9 +484,16 @@ include 'header.php';
             <?php if(!empty($pricingPlans)): foreach ($pricingPlans as $plan): 
                 $isDark = ($plan['style_mode'] === 'dark');
                 $features = json_decode($plan['features'], true) ?? [];
-                $cardClass = $isDark ? 'bg-gray-900 text-white border border-gray-700' : 'bg-white text-gray-800';
-                $priceColor = $isDark ? 'text-orange-500' : 'text-green-700';
-                $btnClass = $isDark ? 'bg-orange-600 hover:bg-orange-700' : 'bg-green-700 hover:bg-green-800';
+                
+                // --- COLOR LOGIC UPDATE ---
+                // Dark Card: Dark Green BG + Yellow Text/Button
+                // Light Card: White BG + Green Text/Button
+                $cardClass = $isDark ? 'bg-[#0a260a] text-white border border-[#2E4622]' : 'bg-white text-gray-800 border border-gray-100';
+                $priceColor = $isDark ? 'text-yellow-400' : 'text-green-700'; // Changed Orange to Yellow-400
+                $iconColor  = $isDark ? 'text-yellow-400' : 'text-green-500'; // Icons now Yellow
+                
+                // Button: Yellow background needs Black text for contrast
+                $btnClass   = $isDark ? 'bg-yellow-500 hover:bg-yellow-400 text-black' : 'bg-green-700 hover:bg-green-800 text-white';
             ?>
                 <div class="<?php echo $cardClass; ?> rounded-2xl p-6 md:p-8 shadow-2xl transform transition hover:scale-105 relative overflow-hidden">
                     <?php if (!empty($plan['badge_text'])): ?>
@@ -335,13 +515,13 @@ include 'header.php';
                     <ul class="space-y-2 md:space-y-3 mb-6 md:mb-8 text-sm md:text-base">
                         <?php foreach ($features as $feature): ?>
                             <li class="flex items-center">
-                                <span class="material-symbols-outlined <?php echo $isDark ? 'text-orange-500' : 'text-green-500'; ?> mr-2 text-lg">check</span>
+                                <span class="material-symbols-outlined <?php echo $iconColor; ?> mr-2 text-lg">check</span>
                                 <?php echo htmlspecialchars($feature); ?>
                             </li>
                         <?php endforeach; ?>
                     </ul>
                     
-                    <button onclick="openBooking()" class="w-full py-3 md:py-4 <?php echo $btnClass; ?> text-white rounded-xl font-bold transition shadow-lg text-sm md:text-base">
+                    <button onclick="openBooking()" class="w-full py-3 md:py-4 <?php echo $btnClass; ?> rounded-xl font-bold transition shadow-lg text-sm md:text-base">
                         <?php echo htmlspecialchars($plan['btn_text']); ?>
                     </button>
                 </div>

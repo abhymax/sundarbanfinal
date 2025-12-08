@@ -121,7 +121,7 @@ window.addEventListener('load', () => {
             const map = new Map(mapElement, {
                 center: { lat: 22.35, lng: 88.60 },
                 zoom: 9,
-                mapId: 'SUNDARBAN_MAP_ID',
+                mapId: '7409f494961b2d4e9e4bff1f',
                 gestureHandling: 'greedy',
                 disableDefaultUI: true,
                 zoomControl: true

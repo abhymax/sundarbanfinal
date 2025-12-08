@@ -70,7 +70,7 @@ try {
 
                     <?php elseif ($section['type'] == 'links'): ?>
                         <div>
-                            <h4 class="text-white font-bold text-sm uppercase tracking-[0.15em] mb-6 border-l-4 border-[#FFD700] pl-3">
+                            <h4 class="text-white font-bold text-sm uppercase tracking-[0.15em] mb-6 border-l-4 border-[#FFD700] pl-3 font-[Arial,sans-serif]">
                                 <?php echo htmlspecialchars($section['title']); ?>
                             </h4>
                             <div class="footer-links text-gray-400 text-[15px] space-y-3.5 [&_li]:flex [&_li]:items-center [&_a]:flex [&_a]:items-center [&_a]:gap-2 [&_a]:transition-colors [&_a:hover]:text-[#FFD700]">
@@ -84,7 +84,7 @@ try {
 
                     <?php elseif ($section['type'] == 'contact'): ?>
                         <div class="col-span-2 lg:col-span-1">
-                            <h4 class="text-white font-bold text-sm uppercase tracking-[0.15em] mb-6 border-l-4 border-[#FFD700] pl-3">
+                            <h4 class="text-white font-bold text-sm uppercase tracking-[0.15em] mb-6 border-l-4 border-[#FFD700] pl-3 font-[Arial,sans-serif]">
                                 <?php echo htmlspecialchars($section['title']); ?>
                             </h4>
                             

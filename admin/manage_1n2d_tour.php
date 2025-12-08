@@ -16,7 +16,6 @@ if (isset($_GET['delete_timeline'])) {
     $pdo->prepare("DELETE FROM page_timeline WHERE id = ?")->execute([$_GET['delete_timeline']]);
     header("Location: manage_1n2d_tour.php?tab=itinerary&msg=deleted"); exit;
 }
-// (Keep food/pricing delete handlers same as before...)
 if (isset($_GET['delete_food'])) {
     $pdo->prepare("DELETE FROM page_food_menu WHERE id = ?")->execute([$_GET['delete_food']]);
     header("Location: manage_1n2d_tour.php?tab=food&msg=deleted"); exit;
@@ -29,22 +28,40 @@ if (isset($_GET['delete_pricing'])) {
 // --- POST HANDLERS ---
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     
-    // 1. Hero, 2. Cards, 3. Experience (Same as before - code collapsed for brevity)
-    // ... [Paste the exact Hero, Cards, Experience logic from previous response here] ...
+    // 1. HERO SECTION
     if (isset($_POST['update_hero'])) {
         try {
-            $image_url = $_POST['current_image_url'];
+            $image_url = $_POST['current_image_url'] ?? '';
             if (isset($_FILES['hero_image']) && $_FILES['hero_image']['error'] === UPLOAD_ERR_OK) {
                 $ext = strtolower(pathinfo($_FILES['hero_image']['name'], PATHINFO_EXTENSION));
-                if (move_uploaded_file($_FILES['hero_image']['tmp_name'], '../uploads/1n2d_hero_' . time() . '.' . $ext)) {
-                    $image_url = 'uploads/1n2d_hero_' . time() . '.' . $ext;
+                $allowed = ['jpg', 'jpeg', 'png', 'webp'];
+                if (in_array($ext, $allowed)) {
+                    $newFile = '1n2d_hero_' . time() . '.' . $ext;
+                    if (move_uploaded_file($_FILES['hero_image']['tmp_name'], '../uploads/' . $newFile)) {
+                        $image_url = 'uploads/' . $newFile;
+                    }
                 }
             }
-            $pdo->prepare("UPDATE site_sections SET title=?, subtitle=?, cta_text=?, cta_link=?, image_url=?, overlay_opacity=? WHERE section_key=?")->execute([$_POST['hero_title'], $_POST['hero_subtitle'], $_POST['cta_text'], $_POST['cta_link'], $image_url, $_POST['overlay_opacity'], "{$PAGE_KEY}_hero"]);
-            $message = "Hero updated!"; $messageType = "success";
+
+            // Smart Insert/Update
+            $sectionKey = "{$PAGE_KEY}_hero";
+            $check = $pdo->prepare("SELECT COUNT(*) FROM site_sections WHERE section_key = ?");
+            $check->execute([$sectionKey]);
+
+            if ($check->fetchColumn() > 0) {
+                $stmt = $pdo->prepare("UPDATE site_sections SET title=?, subtitle=?, cta_text=?, cta_link=?, image_url=?, overlay_opacity=? WHERE section_key=?");
+                $stmt->execute([$_POST['hero_title'], $_POST['hero_subtitle'], $_POST['cta_text'], $_POST['cta_link'], $image_url, $_POST['overlay_opacity'], $sectionKey]);
+            } else {
+                $stmt = $pdo->prepare("INSERT INTO site_sections (section_key, title, subtitle, cta_text, cta_link, image_url, overlay_opacity) VALUES (?, ?, ?, ?, ?, ?, ?)");
+                $stmt->execute([$sectionKey, $_POST['hero_title'], $_POST['hero_subtitle'], $_POST['cta_text'], $_POST['cta_link'], $image_url, $_POST['overlay_opacity']]);
+            }
+
+            $message = "Hero updated successfully!"; 
+            $messageType = "success";
         } catch (Exception $e) { $message = "Error: " . $e->getMessage(); $messageType = "error"; }
     }
 
+    // 2. CARDS
     if (isset($_POST['update_cards'])) {
         try {
            foreach ($_POST['cards'] as $id => $card) {
@@ -54,6 +71,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
        } catch (Exception $e) { $message = "Error: " . $e->getMessage(); $messageType = "error"; }
    }
 
+   // 3. EXPERIENCE
    if (isset($_POST['update_experience'])) {
        try {
            $pdo->prepare("UPDATE site_sections SET title=?, subtitle=? WHERE section_key=?")->execute([$_POST['exp_header_title'], $_POST['exp_header_subtitle'], "{$PAGE_KEY}_exp_header"]);
@@ -61,8 +79,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                $image_url = $h['current_image'];
                if (isset($_FILES['highlight_image_'.$id]) && $_FILES['highlight_image_'.$id]['error'] === UPLOAD_ERR_OK) {
                    $ext = strtolower(pathinfo($_FILES['highlight_image_'.$id]['name'], PATHINFO_EXTENSION));
-                   if (move_uploaded_file($_FILES['highlight_image_'.$id]['tmp_name'], '../uploads/1n2d_hl_' . $id . '_' . time() . '.' . $ext)) {
-                       $image_url = 'uploads/1n2d_hl_' . $id . '_' . time() . '.' . $ext;
+                   $newFile = '1n2d_hl_' . $id . '_' . time() . '.' . $ext;
+                   if (move_uploaded_file($_FILES['highlight_image_'.$id]['tmp_name'], '../uploads/' . $newFile)) {
+                       $image_url = 'uploads/' . $newFile;
                    }
                }
                $bullets = array_filter(array_map('trim', explode("\n", $h['bullets'])));
@@ -72,7 +91,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
        } catch (Exception $e) { $message = "Error: " . $e->getMessage(); $messageType = "error"; }
    }
 
-    // 4. ITINERARY (UPDATED FOR DAY NUMBER)
+    // 4. ITINERARY HEADER
     if (isset($_POST['update_itinerary_header'])) {
         try {
             $pdo->prepare("UPDATE site_sections SET title=?, subtitle=? WHERE section_key=?")->execute([$_POST['itin_title'], $_POST['itin_subtitle'], "{$PAGE_KEY}_itin_header"]);
@@ -80,17 +99,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } catch (Exception $e) { $message = "Error: " . $e->getMessage(); $messageType = "error"; }
     }
 
+    // 5. SAVE EVENT (Fix: Better file naming & Image Preview logic)
     if (isset($_POST['save_event'])) {
          try {
             $image_url = $_POST['current_event_image'] ?? '';
+            
             if (isset($_FILES['event_image']) && $_FILES['event_image']['error'] === UPLOAD_ERR_OK) {
                 $ext = strtolower(pathinfo($_FILES['event_image']['name'], PATHINFO_EXTENSION));
-                if (move_uploaded_file($_FILES['event_image']['tmp_name'], '../uploads/1n2d_ev_' . time() . '.' . $ext)) {
-                    $image_url = 'uploads/1n2d_ev_' . time() . '.' . $ext;
+                // Add random number to avoid caching issues
+                $newFile = '1n2d_ev_' . time() . '_' . rand(100,999) . '.' . $ext;
+                if (move_uploaded_file($_FILES['event_image']['tmp_name'], '../uploads/' . $newFile)) {
+                    $image_url = 'uploads/' . $newFile;
                 }
             }
             
-            $day_num = (int)$_POST['day_number']; // Get Day Number
+            $day_num = (int)$_POST['day_number'];
 
             if (!empty($_POST['event_id'])) {
                 $pdo->prepare("UPDATE page_timeline SET title=?, time_range=?, description=?, icon=?, color_theme=?, tags=?, image_url=?, sort_order=?, day_number=? WHERE id=?")
@@ -105,8 +128,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } catch (Exception $e) { $message = "Error: " . $e->getMessage(); $messageType = "error"; }
     }
 
-    // 5. FOOD & 6. PRICING (Same as before)
-    // ... [Paste previous Food & Pricing logic here] ...
+    // 6. FOOD MENU
     if (isset($_POST['update_food_header'])) {
         try {
             $pdo->prepare("UPDATE site_sections SET title=?, subtitle=? WHERE section_key=?")->execute([$_POST['food_title'], $_POST['food_subtitle'], "{$PAGE_KEY}_food_header"]);
@@ -118,8 +140,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $image_url = $_POST['current_food_image'] ?? '';
             if (isset($_FILES['food_image']) && $_FILES['food_image']['error'] === UPLOAD_ERR_OK) {
                 $ext = strtolower(pathinfo($_FILES['food_image']['name'], PATHINFO_EXTENSION));
-                if (move_uploaded_file($_FILES['food_image']['tmp_name'], '../uploads/1n2d_food_' . time() . '.' . $ext)) {
-                    $image_url = 'uploads/1n2d_food_' . time() . '.' . $ext;
+                $newFile = '1n2d_food_' . time() . '.' . $ext;
+                if (move_uploaded_file($_FILES['food_image']['tmp_name'], '../uploads/' . $newFile)) {
+                    $image_url = 'uploads/' . $newFile;
                 }
             }
             $items = array_filter(array_map('trim', explode("\n", $_POST['items'])));
@@ -135,6 +158,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } catch (Exception $e) { $message = "Error: " . $e->getMessage(); $messageType = "error"; }
     }
     
+    // 7. PRICING
     if (isset($_POST['update_price_header'])) {
         try {
             $pdo->prepare("UPDATE site_sections SET title=?, subtitle=? WHERE section_key=?")->execute([$_POST['price_title'], $_POST['price_subtitle'], "{$PAGE_KEY}_price_header"]);
@@ -159,13 +183,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 // --- FETCH DATA ---
-// (Fetch code same as before...)
-$hero = $pdo->query("SELECT * FROM site_sections WHERE section_key = '{$PAGE_KEY}_hero'")->fetch(PDO::FETCH_ASSOC);
+$hero = $pdo->query("SELECT * FROM site_sections WHERE section_key = '{$PAGE_KEY}_hero'")->fetch(PDO::FETCH_ASSOC) ?: ['title'=>'', 'subtitle'=>'', 'image_url'=>'', 'cta_text'=>'', 'cta_link'=>'', 'overlay_opacity'=>'0.5'];
 $cards = $pdo->query("SELECT * FROM page_cards WHERE page_key = '$PAGE_KEY' AND section_key = 'quick_info' ORDER BY sort_order ASC")->fetchAll(PDO::FETCH_ASSOC);
 $expHeader = $pdo->query("SELECT * FROM site_sections WHERE section_key = '{$PAGE_KEY}_exp_header'")->fetch(PDO::FETCH_ASSOC);
 $highlights = $pdo->query("SELECT * FROM page_highlights WHERE page_key = '$PAGE_KEY' AND section_key = 'experience' ORDER BY sort_order ASC")->fetchAll(PDO::FETCH_ASSOC);
 $itinHeader = $pdo->query("SELECT * FROM site_sections WHERE section_key = '{$PAGE_KEY}_itin_header'")->fetch(PDO::FETCH_ASSOC);
-// NEW: Order by day_number, then sort_order
 $timeline = $pdo->query("SELECT * FROM page_timeline WHERE page_key = '$PAGE_KEY' ORDER BY day_number ASC, sort_order ASC")->fetchAll(PDO::FETCH_ASSOC);
 $foodHeader = $pdo->query("SELECT * FROM site_sections WHERE section_key = '{$PAGE_KEY}_food_header'")->fetch(PDO::FETCH_ASSOC);
 $foodMenus = $pdo->query("SELECT * FROM page_food_menu WHERE page_key = '$PAGE_KEY' ORDER BY sort_order ASC")->fetchAll(PDO::FETCH_ASSOC);
@@ -180,9 +202,13 @@ include 'header.php';
         <div><h1 class="text-4xl font-bold text-safari-dark font-serif">1-Night 2-Days Manager</h1></div>
         <a href="../1-night-2-days-tour.php" target="_blank" class="text-safari-green font-bold hover:underline flex items-center gap-1">Preview <span class="material-symbols-outlined text-sm">visibility</span></a>
     </div>
+
     <?php if ($message || isset($_GET['msg'])): ?>
-        <div class="p-4 mb-6 rounded-xl border bg-green-100 text-green-700 border-green-400 flex items-center gap-2"><span class="material-symbols-outlined">check_circle</span><?php echo $message ?: "Action completed successfully."; ?></div>
+        <div class="p-4 mb-6 rounded-xl border <?php echo ($messageType=='error') ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'; ?> border-green-400 flex items-center gap-2">
+            <span class="material-symbols-outlined">check_circle</span><?php echo $message ?: "Action completed successfully."; ?>
+        </div>
     <?php endif; ?>
+
     <div class="flex gap-4 mb-8 border-b border-gray-200 overflow-x-auto">
         <?php 
         $tabs = ['hero'=>'Hero', 'cards'=>'Quick Info', 'experience'=>'Experience', 'itinerary'=>'Itinerary', 'food'=>'Food Menu', 'pricing'=>'Pricing'];
@@ -198,12 +224,24 @@ include 'header.php';
                 <input type="hidden" name="update_hero" value="1">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div><label class="block font-bold text-sm mb-2">Title</label><input type="text" name="hero_title" value="<?php echo htmlspecialchars($hero['title']); ?>" class="w-full border rounded p-3 font-serif"></div>
-                    <div><label class="block font-bold text-sm mb-2">Button</label><input type="text" name="cta_text" value="<?php echo htmlspecialchars($hero['cta_text']); ?>" class="w-full border rounded p-3"></div>
+                    <div><label class="block font-bold text-sm mb-2">Button Text</label><input type="text" name="cta_text" value="<?php echo htmlspecialchars($hero['cta_text']); ?>" class="w-full border rounded p-3"></div>
+                    <div><label class="block font-bold text-sm mb-2">Button Link</label><input type="text" name="cta_link" value="<?php echo htmlspecialchars($hero['cta_link'] ?? '#'); ?>" class="w-full border rounded p-3" placeholder="e.g. #itinerary"></div>
                     <div class="md:col-span-2"><label class="block font-bold text-sm mb-2">Subtitle</label><textarea name="hero_subtitle" class="w-full border rounded p-3"><?php echo htmlspecialchars($hero['subtitle']); ?></textarea></div>
-                    <div><label class="block font-bold text-sm mb-2">Image</label><input type="file" name="hero_image" class="w-full text-sm"><input type="hidden" name="current_image_url" value="<?php echo $hero['image_url']; ?>"></div>
-                    <div><label class="block font-bold text-sm mb-2">Opacity</label><input type="range" name="overlay_opacity" min="0" max="1" step="0.1" value="<?php echo $hero['overlay_opacity']; ?>" class="w-full accent-safari-green"></div>
+                    
+                    <div>
+                        <label class="block font-bold text-sm mb-2">Image</label>
+                        <?php if (!empty($hero['image_url'])): ?>
+                            <div class="mb-3 p-1 border rounded bg-gray-50 inline-block shadow-sm">
+                                <img src="../<?php echo htmlspecialchars($hero['image_url']); ?>" alt="Current Hero" class="h-32 w-auto object-cover rounded">
+                            </div>
+                        <?php endif; ?>
+                        <input type="file" name="hero_image" class="w-full text-sm">
+                        <input type="hidden" name="current_image_url" value="<?php echo htmlspecialchars($hero['image_url']); ?>">
+                    </div>
+                    
+                    <div><label class="block font-bold text-sm mb-2">Opacity</label><input type="range" name="overlay_opacity" min="0" max="1" step="0.1" value="<?php echo htmlspecialchars($hero['overlay_opacity']); ?>" class="w-full accent-safari-green"></div>
                 </div>
-                <div class="pt-4 flex justify-end"><button type="submit" class="bg-safari-green text-white px-6 py-2 rounded-lg font-bold">Save</button></div>
+                <div class="pt-4 flex justify-end"><button type="submit" class="bg-safari-green text-white px-6 py-2 rounded-lg font-bold">Save Hero</button></div>
             </form>
         </div>
     </div>
@@ -268,14 +306,8 @@ include 'header.php';
         <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 mb-8">
             <form method="POST" class="flex gap-4 items-end">
                 <input type="hidden" name="update_itinerary_header" value="1">
-                <div class="flex-1">
-                    <label class="block text-xs font-bold text-gray-500 mb-1">Section Subtitle</label>
-                    <input type="text" name="itin_subtitle" value="<?php echo htmlspecialchars($itinHeader['subtitle']); ?>" class="w-full border rounded p-2 text-sm">
-                </div>
-                <div class="flex-1">
-                    <label class="block text-xs font-bold text-gray-500 mb-1">Section Title</label>
-                    <input type="text" name="itin_title" value="<?php echo htmlspecialchars($itinHeader['title']); ?>" class="w-full border rounded p-2 font-bold text-lg font-serif">
-                </div>
+                <div class="flex-1"><label class="block text-xs font-bold text-gray-500 mb-1">Subtitle</label><input type="text" name="itin_subtitle" value="<?php echo htmlspecialchars($itinHeader['subtitle']); ?>" class="w-full border rounded p-2 text-sm"></div>
+                <div class="flex-1"><label class="block text-xs font-bold text-gray-500 mb-1">Title</label><input type="text" name="itin_title" value="<?php echo htmlspecialchars($itinHeader['title']); ?>" class="w-full border rounded p-2 font-bold text-lg font-serif"></div>
                 <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-bold text-sm">Update Header</button>
             </form>
         </div>
@@ -295,14 +327,19 @@ include 'header.php';
                     <div class="flex-1">
                         <div class="flex items-center gap-2 mb-1">
                             <span class="text-xs font-bold uppercase text-white bg-gray-800 px-2 py-0.5 rounded">Day <?php echo $event['day_number']; ?></span>
-                            
                             <span class="text-xs font-bold uppercase text-<?php echo $event['color_theme']; ?>-600 bg-<?php echo $event['color_theme']; ?>-50 px-2 py-0.5 rounded"><?php echo $event['time_range']; ?></span>
-                            <span class="text-xs text-gray-400">Order: <?php echo $event['sort_order']; ?></span>
                         </div>
                         <h3 class="font-bold text-gray-800"><?php echo htmlspecialchars($event['title']); ?></h3>
                     </div>
+                    
+                    <?php if(!empty($event['image_url'])): ?>
+                        <div class="w-16 h-16 shrink-0 bg-gray-100 rounded border overflow-hidden">
+                            <img src="<?php echo (strpos($event['image_url'], 'http')===0 ? $event['image_url'] : '../'.$event['image_url']); ?>" class="w-full h-full object-cover">
+                        </div>
+                    <?php endif; ?>
+
                     <div class="flex gap-2">
-                        <button onclick='editEvent(<?php echo json_encode($event); ?>)' class="p-2 text-blue-600 hover:bg-blue-50 rounded"><span class="material-symbols-outlined">edit</span></button>
+                        <button onclick='editEvent(<?php echo htmlspecialchars(json_encode($event), ENT_QUOTES, 'UTF-8'); ?>)' class="p-2 text-blue-600 hover:bg-blue-50 rounded"><span class="material-symbols-outlined">edit</span></button>
                         <a href="?delete_timeline=<?php echo $event['id']; ?>" onclick="return confirm('Delete?')" class="p-2 text-red-600 hover:bg-red-50 rounded"><span class="material-symbols-outlined">delete</span></a>
                     </div>
                 </div>
@@ -387,7 +424,15 @@ include 'header.php';
                         <div><label class="block text-xs font-bold text-gray-600 mb-1">Color</label><select name="color" id="event_color" class="w-full border rounded p-2"><option value="orange">Orange</option><option value="green">Green</option><option value="blue">Blue</option><option value="yellow">Yellow</option><option value="gray">Gray</option></select></div>
                     </div>
                     <div><label class="block text-xs font-bold text-gray-600 mb-1">Tags</label><input type="text" name="tags" id="event_tags" class="w-full border rounded p-2"></div>
-                    <div><label class="block text-xs font-bold text-gray-600 mb-1">Image</label><input type="file" name="event_image" class="w-full text-sm"><input type="hidden" name="current_event_image" id="current_event_image"></div>
+                    
+                    <div>
+                        <label class="block text-xs font-bold text-gray-600 mb-1">Image</label>
+                        <div id="imagePreviewContainer" class="hidden mb-2">
+                            <img id="imagePreview" src="" class="h-20 w-auto rounded border">
+                        </div>
+                        <input type="file" name="event_image" class="w-full text-sm">
+                        <input type="hidden" name="current_event_image" id="current_event_image">
+                    </div>
                 </div>
                 <div class="flex justify-end gap-3 mt-6 border-t pt-4">
                     <button type="button" onclick="document.getElementById('eventModal').classList.add('hidden')" class="px-4 py-2 font-bold text-gray-500">Cancel</button>
@@ -433,11 +478,11 @@ include 'header.php';
                     <div><label class="block text-xs font-bold text-gray-600 mb-1">Subtitle</label><input type="text" name="subtitle" id="price_subtitle" class="w-full border rounded p-2 text-sm"></div>
                     <div class="grid grid-cols-2 gap-4">
                         <div><label class="block text-xs font-bold text-gray-600 mb-1">Price</label><input type="text" name="price" id="price_amt" class="w-full border rounded p-2 font-bold" required></div>
-                        <div><label class="block text-xs font-bold text-gray-600 mb-1">Unit</label><input type="text" name="unit" id="price_unit" placeholder="/person" class="w-full border rounded p-2"></div>
+                        <div><label class="block text-xs font-bold text-gray-600 mb-1">Unit</label><input type="text" name="unit" id="price_unit" class="w-full border rounded p-2"></div>
                     </div>
                     <div><label class="block text-xs font-bold text-gray-600 mb-1">Features (One per line)</label><textarea name="features" id="price_features" rows="4" class="w-full border rounded p-2 font-mono text-sm"></textarea></div>
                     <div class="grid grid-cols-2 gap-4">
-                        <div><label class="block text-xs font-bold text-gray-600 mb-1">Button Text</label><input type="text" name="btn_text" id="price_btn" value="Book Now" class="w-full border rounded p-2"></div>
+                        <div><label class="block text-xs font-bold text-gray-600 mb-1">Button Text</label><input type="text" name="btn_text" id="price_btn" class="w-full border rounded p-2"></div>
                         <div><label class="block text-xs font-bold text-gray-600 mb-1">Badge</label><input type="text" name="badge" id="price_badge" class="w-full border rounded p-2"></div>
                     </div>
                 </div>
@@ -454,15 +499,17 @@ include 'header.php';
             document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
             document.querySelectorAll('.tab-btn').forEach(el => { el.classList.remove('text-safari-green', 'border-b-4', 'border-safari-green'); el.classList.add('text-gray-500'); });
             document.getElementById('content-' + tab).classList.remove('hidden');
-            document.getElementById('tab-' + tab).classList.remove('text-gray-500');
-            document.getElementById('tab-' + tab).classList.add('text-safari-green', 'border-b-4', 'border-safari-green');
+            const btn = document.getElementById('tab-' + tab); btn.classList.remove('text-gray-500'); btn.classList.add('text-safari-green', 'border-b-4', 'border-safari-green');
         }
         const urlParams = new URLSearchParams(window.location.search);
         switchTab(urlParams.get('tab') || 'hero');
 
-        function openEventModal() { document.getElementById('eventModal').classList.remove('hidden'); document.getElementById('event_id').value = ''; document.getElementById('event_day').value = '1'; }
+        function openEventModal() { 
+            document.getElementById('eventModal').classList.remove('hidden'); 
+            document.getElementById('event_id').value = ''; 
+            document.getElementById('imagePreviewContainer').classList.add('hidden'); // Hide Preview
+        }
         
-        // Updated editEvent to load day_number
         function editEvent(d) { 
             document.getElementById('eventModal').classList.remove('hidden'); 
             document.getElementById('event_id').value = d.id; 
@@ -473,12 +520,26 @@ include 'header.php';
             document.getElementById('event_color').value = d.color_theme; 
             document.getElementById('event_tags').value = d.tags; 
             document.getElementById('current_event_image').value = d.image_url; 
-            document.getElementById('event_sort').value = d.sort_order;
+            document.getElementById('event_sort').value = d.sort_order; 
             
             // Set Day if available, else default 1
-            document.getElementById('event_day').value = d.day_number || 1; 
+            if(document.getElementById('event_day')) {
+                document.getElementById('event_day').value = d.day_number || 1; 
+            }
+
+            // Show Image Preview in Modal
+            const imgPreview = document.getElementById('imagePreview');
+            const container = document.getElementById('imagePreviewContainer');
+            if(d.image_url) {
+                let src = d.image_url;
+                if(!src.startsWith('http')) src = '../' + src;
+                imgPreview.src = src;
+                container.classList.remove('hidden');
+            } else {
+                container.classList.add('hidden');
+            }
         }
-        // ... (keep other JS functions) ...
+
         function openFoodModal() { document.getElementById('foodModal').classList.remove('hidden'); document.getElementById('food_id').value = ''; }
         function editFood(d) { document.getElementById('foodModal').classList.remove('hidden'); document.getElementById('food_id').value = d.id; document.getElementById('food_title').value = d.title; try{document.getElementById('food_items').value=JSON.parse(d.items).join('\n');}catch(e){} document.getElementById('food_sort').value = d.sort_order; document.getElementById('current_food_image').value = d.image_url; document.getElementById('food_highlight').checked = (d.is_highlighted == 1); }
 

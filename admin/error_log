@@ -78,3 +78,4 @@ Stack trace:
 [03-Dec-2025 22:45:04 UTC] PHP Warning:  Undefined array key "cta_link" in /home/s4rgthy671q/public_html/admin/manage_1n2d_tour.php on line 43
 [03-Dec-2025 23:16:26 UTC] PHP Warning:  Undefined array key "cta_link" in /home/s4rgthy671q/public_html/admin/manage_2n3d_tour.php on line 39
 [06-Dec-2025 16:57:02 UTC] PHP Warning:  Undefined array key "cta_link" in /home/s4rgthy671q/public_html/admin/manage_1n2d_tour.php on line 43
+[07-Dec-2025 22:51:57 UTC] PHP Warning:  Undefined array key "color" in /home/s4rgthy671q/public_html/admin/manage_2n3d_tour.php on line 117
